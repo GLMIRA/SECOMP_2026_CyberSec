@@ -1,0 +1,46 @@
+<!-- Tela administrativa: lista e deleta usuarios -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco CTF - Admin</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="app">
+    <header class="topbar">
+        <button class="hamburguer" onclick="alternarMenu()">&#9776;</button>
+        <div class="marca">BANCO <span>CTF</span></div>
+        <div class="ola" id="ola"></div>
+    </header>
+
+    <div class="overlay-menu" id="overlayMenu" onclick="alternarMenu()"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="titulo-menu">MENU</div>
+        <a href="saldo.html">Saldo</a>
+        <a href="deposito.html">Depositar</a>
+        <a href="saque.html">Sacar</a>
+        <a href="extrato.html">Extrato</a>
+        <a href="perfil.html">Meu usuario</a>
+        <a href="admin.html" id="link-admin" class="oculto ativo">Admin</a>
+        <a href="#" onclick="logout(); return false;">Sair</a>
+    </aside>
+
+    <main class="conteudo">
+        <div class="painel largo">
+            <h1>Painel <span>administrativo</span></h1>
+
+            <div class="card">
+                <h2>Usuarios</h2>
+                <div id="tabela_admin" class="tabela-wrap"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/app.js"></script>
+    <script>
+        // Ao abrir, carrega a lista de usuarios.
+        carregarAdmin();
+    </script>
+</body>
+</html>

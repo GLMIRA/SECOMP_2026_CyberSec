@@ -1,0 +1,51 @@
+<!-- Tela de editar o usuario logado -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco CTF - Meu usuario</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="app">
+    <header class="topbar">
+        <button class="hamburguer" onclick="alternarMenu()">&#9776;</button>
+        <div class="marca">BANCO <span>CTF</span></div>
+        <div class="ola" id="ola"></div>
+    </header>
+
+    <div class="overlay-menu" id="overlayMenu" onclick="alternarMenu()"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="titulo-menu">MENU</div>
+        <a href="saldo.html">Saldo</a>
+        <a href="deposito.html">Depositar</a>
+        <a href="saque.html">Sacar</a>
+        <a href="extrato.html">Extrato</a>
+        <a href="perfil.html" class="ativo">Meu usuario</a>
+        <a href="admin.html" id="link-admin" class="oculto">Admin</a>
+        <a href="#" onclick="logout(); return false;">Sair</a>
+    </aside>
+
+    <main class="conteudo">
+        <div class="painel">
+            <h1>Editar <span>usuario</span></h1>
+
+            <div class="card">
+                <h2>Meus dados</h2>
+                <input id="perf_usuario" placeholder="usuario">
+                <input id="perf_nome" placeholder="nome">
+                <input id="perf_cpf" placeholder="cpf">
+                <input id="perf_senha" type="password" placeholder="nova senha (em branco = manter)">
+                <button onclick="atualizarPerfil()">Salvar</button>
+                <div id="msg_perfil" class="msg"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/app.js"></script>
+    <script>
+        // Ao abrir, carrega os dados atuais do cliente nos campos.
+        carregarPerfil();
+    </script>
+</body>
+</html>

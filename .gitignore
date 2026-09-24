@@ -1,0 +1,22 @@
+# Anotacoes privadas (nunca versionar) — mapa das falhas fica fora do repo
+**/ai/
+
+# Bancos de dados locais
+**/*.db
+
+# Builds
+**/out/
+**/bin/
+**/obj/
+**/__pycache__/
+**/*.class
+
+# Ambientes Python
+**/.venv/
+**/venv/
+
+# IDE / SO
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

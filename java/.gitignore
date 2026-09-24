@@ -1,0 +1,21 @@
+# Compilados do Java
+*.class
+
+# Pastas de build
+target/
+out/
+bin/
+
+# Arquivos de IDE
+.idea/
+.vscode/
+*.iml
+
+# Logs
+*.log
+
+# Banco SQLite
+*.db
+
+# Contexto/anotações do projeto (nunca versionar)
+ai/

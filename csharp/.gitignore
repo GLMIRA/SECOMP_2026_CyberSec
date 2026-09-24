@@ -1,0 +1,14 @@
+# .NET
+bin/
+obj/
+
+# Banco SQLite
+*.db
+
+# IDE
+.idea/
+.vs/
+.vscode/
+
+# Contexto/anotações do projeto (nunca versionar)
+ai/

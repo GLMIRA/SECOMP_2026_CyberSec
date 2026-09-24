@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Banco SQLite
+*.db
+
+# IDE
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# Contexto/anotações do projeto (nunca versionar)
+ai/

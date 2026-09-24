@@ -1,0 +1,604 @@
+/* Estilos do Banco CTF - tema preto, amarelo e branco */
+
+:root {
+    --preto: #14140f;
+    --preto-2: #24241d;
+    --amarelo: #ffd400;
+    --amarelo-escuro: #e6be00;
+    --branco: #ffffff;
+    --cinza-fundo: #f4f4f5;
+    --cinza-borda: #e3e3e3;
+    --cinza-texto: #555555;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: var(--cinza-fundo);
+    color: var(--preto);
+}
+
+/* ---------- Cabecalho (paginas internas) ---------- */
+.topo {
+    background: var(--preto);
+    padding: 12px 20px;
+    border-bottom: 3px solid var(--amarelo);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-mini {
+    width: 32px;
+    height: 32px;
+    display: block;
+}
+
+.marca {
+    font-weight: 800;
+    font-size: 1.25em;
+    letter-spacing: 1px;
+    color: var(--branco);
+}
+
+.marca span {
+    color: var(--amarelo);
+}
+
+/* ---------- Conteudo central ---------- */
+.container {
+    max-width: 460px;
+    margin: 24px auto;
+    padding: 0 16px;
+}
+
+/* Tela de acesso centralizada na vertical */
+.tela-centro {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+}
+
+.acesso {
+    width: 100%;
+    max-width: 400px;
+}
+
+.logo {
+    display: block;
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 12px;
+}
+
+.marca-centro {
+    text-align: center;
+    font-weight: 800;
+    font-size: 1.5em;
+    letter-spacing: 1px;
+    margin-bottom: 22px;
+}
+
+.marca-centro span {
+    color: var(--amarelo-escuro);
+}
+
+/* ---------- Aviso educacional ---------- */
+.aviso {
+    background: #fff6cc;
+    border-left: 4px solid var(--amarelo);
+    color: #6b5900;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 0.85em;
+    margin-top: 20px;
+}
+
+/* ---------- Cartoes ---------- */
+.card {
+    background: var(--branco);
+    border: 1px solid var(--cinza-borda);
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.card h2 {
+    margin: 0 0 16px;
+    font-size: 1.15em;
+}
+
+/* ---------- Campos ---------- */
+input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 1px solid var(--cinza-borda);
+    border-radius: 8px;
+    font-size: 1em;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--amarelo);
+    box-shadow: 0 0 0 3px rgba(255, 212, 0, 0.25);
+}
+
+/* ---------- Botoes ---------- */
+button,
+.btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: var(--amarelo);
+    color: var(--preto);
+    font-weight: 700;
+    font-size: 1em;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: background 0.15s;
+}
+
+button:hover,
+.btn:hover {
+    background: var(--amarelo-escuro);
+}
+
+.btn-secundario {
+    background: transparent;
+    color: var(--branco);
+    border: 2px solid var(--amarelo);
+    margin-top: 10px;
+}
+
+.btn-secundario:hover {
+    background: rgba(255, 212, 0, 0.15);
+}
+
+/* ---------- Links auxiliares ---------- */
+.links {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 0.9em;
+}
+
+.links a {
+    color: var(--preto);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.links a:hover {
+    text-decoration: underline;
+}
+
+/* ---------- Navegacao interna ---------- */
+.nav {
+    display: flex;
+    gap: 6px;
+    background: var(--preto);
+    padding: 8px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+}
+
+.nav a {
+    flex: 1;
+    text-align: center;
+    padding: 8px;
+    color: var(--branco);
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.9em;
+}
+
+.nav a:hover {
+    background: var(--preto-2);
+    color: var(--amarelo);
+}
+
+/* ---------- Saudacao ---------- */
+.saudacao {
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+/* ---------- Mensagens ---------- */
+.msg {
+    margin-top: 12px;
+    font-size: 0.95em;
+    color: var(--cinza-texto);
+    word-wrap: break-word;
+}
+
+/* ---------- Pagina inicial (home) ---------- */
+.home {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Barra de navegacao do topo */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 28px;
+    background: var(--branco);
+    border-bottom: 2px solid var(--amarelo);
+}
+
+.navbar .marca {
+    color: var(--preto);
+}
+
+.navbar .marca span {
+    color: var(--amarelo-escuro);
+}
+
+.menu {
+    display: flex;
+    gap: 26px;
+}
+
+.menu a {
+    color: var(--preto);
+    text-decoration: none;
+    font-weight: 600;
+    padding-bottom: 4px;
+}
+
+.menu a:hover {
+    color: var(--amarelo-escuro);
+}
+
+.menu a.ativo {
+    border-bottom: 3px solid var(--amarelo);
+}
+
+/* Area central com a imagem dos cartoes */
+.home-hero {
+    flex: 1;
+    background: var(--preto) url("../img/cartoes.jpg") center / cover no-repeat;
+}
+
+/* Miolo centralizado (login, cadastro, recuperar) usando o mesmo template */
+.home-centro {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+}
+
+.home-centro .acesso {
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Versao com a imagem dos cartoes ao fundo e o formulario por cima */
+.home-centro.com-fundo {
+    position: relative;
+    background: var(--preto) url("../img/cartoes.jpg") center / cover no-repeat;
+}
+
+.home-centro.com-fundo::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(20, 20, 15, 0.6);
+}
+
+.home-centro.com-fundo .acesso {
+    position: relative;
+    z-index: 1;
+}
+
+/* Rodape */
+.rodape {
+    text-align: center;
+    padding: 18px;
+    background: var(--preto);
+    color: #cfcfcf;
+    font-size: 0.9em;
+    border-top: 3px solid var(--amarelo);
+}
+
+/* ==================================================================== */
+/*  Area logada (HUD): topbar + menu lateral retratil + conteudo        */
+/* ==================================================================== */
+
+.app {
+    margin: 0;
+    min-height: 100vh;
+}
+
+/* Barra do topo */
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--preto);
+    border-bottom: 3px solid var(--amarelo);
+    padding: 12px 20px;
+    color: var(--branco);
+}
+
+.hamburguer {
+    width: auto;
+    background: transparent;
+    color: var(--amarelo);
+    border: none;
+    font-size: 1.5em;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 6px;
+}
+
+.hamburguer:hover {
+    background: transparent;
+    color: var(--amarelo-escuro);
+}
+
+.topbar .marca {
+    color: var(--branco);
+}
+
+.topbar .ola {
+    margin-left: auto;
+    color: #e6e6e6;
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+/* Menu lateral retratil (drawer) */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 230px;
+    background: var(--preto);
+    border-right: 2px solid var(--amarelo);
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 50;
+    padding-top: 64px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar.aberto {
+    transform: translateX(0);
+}
+
+.sidebar .titulo-menu {
+    color: var(--amarelo);
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 0 22px 12px;
+    font-size: 0.85em;
+}
+
+.sidebar a {
+    color: var(--branco);
+    text-decoration: none;
+    padding: 14px 22px;
+    border-left: 4px solid transparent;
+    transition: background 0.15s;
+}
+
+.sidebar a:hover {
+    background: var(--preto-2);
+    color: var(--amarelo);
+}
+
+.sidebar a.ativo {
+    border-left-color: var(--amarelo);
+    color: var(--amarelo);
+    background: var(--preto-2);
+}
+
+/* Fundo escuro atras do menu aberto */
+.overlay-menu {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 40;
+}
+
+.overlay-menu.aberto {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Area de conteudo com a imagem de fundo em camadas */
+.conteudo {
+    position: relative;
+    min-height: calc(100vh - 52px);
+    padding: 34px 26px;
+    background: var(--preto) url("../img/fundo.jpg") center / cover no-repeat;
+    background-attachment: fixed;
+}
+
+.conteudo::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(20, 20, 15, 0.74);
+}
+
+/* Coluna do painel (alinhada a esquerda, nao centralizada) */
+.painel {
+    position: relative;
+    z-index: 1;
+    max-width: 520px;
+}
+
+.painel h1 {
+    color: var(--branco);
+    font-size: 1.4em;
+    margin: 0 0 18px;
+}
+
+.painel h1 span {
+    color: var(--amarelo);
+}
+
+/* ==================================================================== */
+/*  Responsivo: o site se ajusta ao tamanho da tela                     */
+/* ==================================================================== */
+
+/* Nenhuma imagem estoura a largura da tela */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Telas grandes: menu lateral fixo (dashboard), sem hamburguer */
+@media (min-width: 992px) {
+    .hamburguer {
+        display: none;
+    }
+
+    .overlay-menu {
+        display: none;
+    }
+
+    .sidebar {
+        transform: none;
+        padding-top: 18px;
+    }
+
+    .topbar {
+        margin-left: 230px;
+    }
+
+    .conteudo {
+        margin-left: 230px;
+    }
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 14px 18px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .menu {
+        gap: 18px;
+    }
+
+    .conteudo {
+        padding: 26px 18px;
+    }
+}
+
+/* Celulares */
+@media (max-width: 600px) {
+    .navbar {
+        padding: 12px 16px;
+    }
+
+    .navbar .marca,
+    .topbar .marca {
+        font-size: 1.05em;
+    }
+
+    .menu {
+        gap: 14px;
+        font-size: 0.95em;
+    }
+
+    .home-centro {
+        padding: 24px 14px;
+    }
+
+    .conteudo {
+        padding: 22px 14px;
+        /* fundo fixo trava/zooma no mobile: solta pra rolar junto */
+        background-attachment: scroll;
+    }
+
+    .painel h1 {
+        font-size: 1.2em;
+    }
+
+    .topbar .ola {
+        font-size: 0.8em;
+    }
+
+    /* Na home, mostra a imagem inteira dos cartoes (sem cortar) */
+    .home-hero {
+        background-size: contain;
+        background-color: var(--preto);
+        min-height: 60vh;
+    }
+}
+
+/* ---------- Tabela do painel admin ---------- */
+.painel.largo {
+    max-width: 900px;
+}
+
+.tabela-wrap {
+    overflow-x: auto;
+}
+
+.tabela {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+    background: var(--branco);
+}
+
+.tabela th,
+.tabela td {
+    padding: 9px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--cinza-borda);
+    white-space: nowrap;
+}
+
+.tabela th {
+    background: var(--preto);
+    color: var(--amarelo);
+    font-size: 0.85em;
+    letter-spacing: 0.5px;
+}
+
+.btn-del {
+    width: auto;
+    padding: 6px 12px;
+    background: #c0392b;
+    color: #fff;
+    font-size: 0.85em;
+}
+
+.btn-del:hover {
+    background: #a93226;
+}
+
+/* Item de menu escondido (ex.: Admin, so aparece para administradores) */
+.oculto {
+    display: none;
+}

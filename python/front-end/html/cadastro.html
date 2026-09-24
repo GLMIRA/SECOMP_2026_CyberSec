@@ -1,0 +1,45 @@
+<!-- Tela de cadastro (abrir conta) -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco CTF - Abrir conta</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="home">
+    <header class="navbar">
+        <div class="marca">BANCO <span>CTF</span></div>
+        <nav class="menu">
+            <a href="../index.html">Home</a>
+            <a href="login.html">Login</a>
+            <a href="cadastro.html" class="ativo">Cadastro</a>
+        </nav>
+    </header>
+
+    <main class="home-centro com-fundo">
+        <div class="acesso">
+            <img class="logo" src="../img/logo.svg" alt="Banco CTF">
+            <div class="card">
+                <h2>Abrir conta</h2>
+                <input id="cad_usuario" placeholder="usuario">
+                <input id="cad_senha" type="password" placeholder="senha">
+                <input id="cad_nome" placeholder="nome completo">
+                <input id="cad_cpf" placeholder="cpf">
+                <button onclick="cadastrar()">Cadastrar</button>
+                <div id="msg_cadastro" class="msg"></div>
+                <div class="links">
+                    <a href="login.html">Ja tenho conta</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="rodape">
+        AVISO: projeto educacional. Contem codigo inseguro de proposito.
+        NAO use em producao. Uso apenas em localhost.
+    </footer>
+
+    <script src="../js/app.js"></script>
+</body>
+</html>

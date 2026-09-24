@@ -1,0 +1,45 @@
+<!-- Tela de depósito -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco CTF - Depositar</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="app">
+    <header class="topbar">
+        <button class="hamburguer" onclick="alternarMenu()">&#9776;</button>
+        <div class="marca">BANCO <span>CTF</span></div>
+        <div class="ola" id="ola"></div>
+    </header>
+
+    <div class="overlay-menu" id="overlayMenu" onclick="alternarMenu()"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="titulo-menu">MENU</div>
+        <a href="saldo.html">Saldo</a>
+        <a href="deposito.html" class="ativo">Depositar</a>
+        <a href="saque.html">Sacar</a>
+        <a href="extrato.html">Extrato</a>
+        <a href="perfil.html">Meu usuario</a>
+        <a href="admin.html" id="link-admin" class="oculto">Admin</a>
+        <a href="#" onclick="logout(); return false;">Sair</a>
+    </aside>
+
+    <main class="conteudo">
+        <div class="painel">
+            <h1>Fazer <span>deposito</span></h1>
+
+            <div class="card">
+                <h2>Depositar</h2>
+                <input id="dep_conta" placeholder="numero da conta">
+                <input id="dep_valor" placeholder="valor">
+                <button onclick="depositar()">Depositar</button>
+                <div id="msg_deposito" class="msg"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/app.js"></script>
+</body>
+</html>
