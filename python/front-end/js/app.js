@@ -31,14 +31,47 @@ async function enviarJson(rota, dados) {
 
 // ----- Cadastro -----
 async function cadastrar() {
-    const dados = {
-        usuario: document.getElementById("cad_usuario").value,
-        senha: document.getElementById("cad_senha").value,
-        nome: document.getElementById("cad_nome").value,
-        cpf: document.getElementById("cad_cpf").value
-    };
-    const resposta = await enviarPost("/cadastro", dados);
+    const usuario = document.getElementById("cad_usuario").value;
+    const senha = document.getElementById("cad_senha").value;
+    const nome = document.getElementById("cad_nome").value;
+    const cpf = document.getElementById("cad_cpf").value;
+
+    // Validacoes feitas AQUI no navegador (front-end).
+    if (usuario.length > 15) {
+        mostrar("msg_cadastro", "Usuario muito longo (maximo 15 caracteres).");
+        return;
+    }
+    if (!cpfValido(cpf)) {
+        mostrar("msg_cadastro", "CPF invalido.");
+        return;
+    }
+
+    const resposta = await enviarPost("/cadastro", { usuario, senha, nome, cpf });
     mostrar("msg_cadastro", resposta);
+}
+
+// Valida o CPF (digitos verificadores) — usado no cadastro.
+function cpfValido(cpf) {
+    cpf = (cpf || "").replace(/[^\d]/g, "");
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
+        return false;
+    }
+    let soma = 0;
+    for (let i = 0; i < 9; i++) {
+        soma += parseInt(cpf[i], 10) * (10 - i);
+    }
+    let d1 = 11 - (soma % 11);
+    if (d1 >= 10) d1 = 0;
+    if (d1 !== parseInt(cpf[9], 10)) {
+        return false;
+    }
+    soma = 0;
+    for (let i = 0; i < 10; i++) {
+        soma += parseInt(cpf[i], 10) * (11 - i);
+    }
+    let d2 = 11 - (soma % 11);
+    if (d2 >= 10) d2 = 0;
+    return d2 === parseInt(cpf[10], 10);
 }
 
 // ----- Login -----
@@ -179,6 +212,13 @@ async function atualizarPerfil() {
     } catch (e) {
         mostrar("msg_perfil", resposta);
     }
+}
+
+// ----- Comprovante -----
+async function verComprovante() {
+    const arquivo = document.getElementById("comp_arquivo").value;
+    const resposta = await fetch(API + "/comprovante?arquivo=" + encodeURIComponent(arquivo));
+    document.getElementById("msg_comprovante").textContent = await resposta.text();
 }
 
 // ----- Admin: lista os usuarios -----
