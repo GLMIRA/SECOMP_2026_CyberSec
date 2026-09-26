@@ -7,19 +7,34 @@
 ## Pré-requisitos
 - **Python 3** (`python3 --version`). Veja `COMO_INSTALAR_PYTHON.md`.
 
-## Passo a passo (rode a partir da raiz `banco-ctf2/`)
+## Passo a passo (rode a partir da raiz `python/`)
+
+O banco `db/banco.db` é **criado automaticamente na 1ª execução**.
+
+### Linux / Kali
 
 1. **Criar o ambiente e instalar o Flask:**
    ```bash
    python3 -m venv .venv
    .venv/bin/pip install -r requirements.txt
    ```
-
-2. **Rodar o servidor** (o banco `db/banco.db` é criado automaticamente na 1ª execução):
+2. **Rodar o servidor:**
    ```bash
    .venv/bin/python back-end/app.py
    ```
+3. **Acessar:** http://localhost:8091
 
+### Windows (cmd ou PowerShell)
+
+1. **Criar o ambiente e instalar o Flask:**
+   ```
+   python -m venv .venv
+   .venv\Scripts\pip install -r requirements.txt
+   ```
+2. **Rodar o servidor:**
+   ```
+   .venv\Scripts\python back-end\app.py
+   ```
 3. **Acessar:** http://localhost:8091
 
 ## Usuários de teste

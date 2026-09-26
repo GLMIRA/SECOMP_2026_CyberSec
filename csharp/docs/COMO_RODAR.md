@@ -7,14 +7,21 @@
 ## Pré-requisitos
 - **.NET SDK 6+** (`dotnet --version`). Veja `COMO_INSTALAR_DOTNET.md`.
 
-## Passo a passo (rode a partir da raiz `banco-ctf3/`)
+## Passo a passo (rode a partir da raiz `csharp/`)
 
-1. **Rodar o servidor** (o banco `db/banco.db` é criado automaticamente na 1ª execução):
-   ```bash
-   dotnet run --project back-end
-   ```
+O banco `db/banco.db` é **criado automaticamente na 1ª execução**. O comando é o mesmo nos dois sistemas.
 
-2. **Acessar:** http://localhost:8092
+### Linux / Kali
+```bash
+dotnet run --project back-end
+```
+
+### Windows (cmd ou PowerShell)
+```
+dotnet run --project back-end
+```
+
+**Acessar:** http://localhost:8092
 
 ## Usuários de teste
 | usuário | senha    |
