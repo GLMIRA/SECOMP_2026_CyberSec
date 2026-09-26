@@ -6,6 +6,9 @@ from util import responder, usuario_logado
 
 rota = Blueprint("saque", __name__)
 
+# Valor maximo por operacao.
+LIMITE = 1_000_000.00
+
 
 @rota.route("/saque", methods=["POST"])
 def saque():
@@ -32,6 +35,10 @@ def saque():
 
     if valor <= 0:
         return responder("O valor do saque deve ser positivo.", 400)
+
+    # Nao pode sacar mais de 1.000.000,00 por operacao.
+    if valor > LIMITE:
+        return responder("Saque maximo por operacao e 1.000.000,00.", 400)
 
     try:
         conexao = banco.conectar()

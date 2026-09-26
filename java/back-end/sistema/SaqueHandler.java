@@ -15,6 +15,9 @@ import java.util.Map;
 
 public class SaqueHandler implements HttpHandler {
 
+    // Valor maximo por operacao.
+    private static final double LIMITE = 1_000_000.00;
+
     @Override
     public void handle(HttpExchange troca) throws IOException {
         if (!troca.getRequestMethod().equals("POST")) {
@@ -44,6 +47,11 @@ public class SaqueHandler implements HttpHandler {
         }
         if (valor <= 0) {
             Util.responder(troca, 400, "O valor do saque deve ser positivo.");
+            return;
+        }
+        // Nao pode sacar mais de 1.000.000,00 por operacao.
+        if (valor > LIMITE) {
+            Util.responder(troca, 400, "Saque maximo por operacao e 1.000.000,00.");
             return;
         }
 

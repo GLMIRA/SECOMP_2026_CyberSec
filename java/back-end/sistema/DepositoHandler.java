@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class DepositoHandler implements HttpHandler {
 
-    // Valor maximo permitido em uma conta.
+    // Valor maximo por operacao (deposito/saque).
     private static final double LIMITE = 1_000_000.00;
 
     @Override
@@ -49,6 +49,11 @@ public class DepositoHandler implements HttpHandler {
             Util.responder(troca, 400, "O valor do deposito deve ser positivo.");
             return;
         }
+        // Nao pode depositar mais de 1.000.000,00 por operacao (nao ha teto de saldo).
+        if (valor > LIMITE) {
+            Util.responder(troca, 400, "Deposito maximo por operacao e 1.000.000,00.");
+            return;
+        }
 
         try {
             // So pode depositar em uma conta sua.
@@ -66,11 +71,8 @@ public class DepositoHandler implements HttpHandler {
                 }
 
                 double novoSaldo = resultado.getDouble("saldo") + valor;
-                if (novoSaldo > LIMITE) {
-                    Util.responder(troca, 400, "Limite de 1.000.000,00 por conta excedido.");
-                    return;
-                }
 
+                // Grava o novo saldo (a conta pode ultrapassar 1.000.000).
                 PreparedStatement atualizar = conexao.prepareStatement("UPDATE contas SET saldo = ? WHERE id = ?");
                 atualizar.setDouble(1, novoSaldo);
                 atualizar.setString(2, conta);

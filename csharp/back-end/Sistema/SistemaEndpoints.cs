@@ -76,6 +76,12 @@ public static class SistemaEndpoints
                 await Web.Responder(ctx, "O valor do deposito deve ser positivo.", 400);
                 return;
             }
+            // Nao pode depositar mais de 1.000.000,00 por operacao (nao ha teto de saldo).
+            if (valor > 1_000_000.00)
+            {
+                await Web.Responder(ctx, "Deposito maximo por operacao e 1.000.000,00.", 400);
+                return;
+            }
 
             // So pode depositar em uma conta sua.
             if (!Banco.ContaPertence(conta, usuarioId.Value))
@@ -99,13 +105,8 @@ public static class SistemaEndpoints
                 }
 
                 var novoSaldo = Convert.ToDouble(atual) + valor;
-                // Aplica a regra do limite maximo por conta.
-                if (novoSaldo > 1_000_000.00)
-                {
-                    await Web.Responder(ctx, "Limite de 1.000.000,00 por conta excedido.", 400);
-                    return;
-                }
 
+                // Grava o novo saldo (a conta pode ultrapassar 1.000.000).
                 var atualizar = conexao.CreateCommand();
                 atualizar.CommandText = "UPDATE contas SET saldo = @s WHERE id = @conta";
                 atualizar.Parameters.AddWithValue("@s", novoSaldo);
@@ -154,6 +155,12 @@ public static class SistemaEndpoints
             if (valor <= 0)
             {
                 await Web.Responder(ctx, "O valor do saque deve ser positivo.", 400);
+                return;
+            }
+            // Nao pode sacar mais de 1.000.000,00 por operacao.
+            if (valor > 1_000_000.00)
+            {
+                await Web.Responder(ctx, "Saque maximo por operacao e 1.000.000,00.", 400);
                 return;
             }
 

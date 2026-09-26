@@ -6,7 +6,7 @@ from util import responder, usuario_logado
 
 rota = Blueprint("deposito", __name__)
 
-# Valor maximo permitido em uma conta.
+# Valor maximo por operacao (deposito/saque).
 LIMITE = 1_000_000.00
 
 
@@ -36,6 +36,10 @@ def deposito():
     if valor <= 0:
         return responder("O valor do deposito deve ser positivo.", 400)
 
+    # Nao pode depositar mais de 1.000.000,00 por operacao (nao ha teto de saldo).
+    if valor > LIMITE:
+        return responder("Deposito maximo por operacao e 1.000.000,00.", 400)
+
     try:
         conexao = banco.conectar()
         cursor = conexao.cursor()
@@ -50,12 +54,7 @@ def deposito():
 
         novo_saldo = linha[0] + valor
 
-        # Aplica a regra do limite maximo por conta.
-        if novo_saldo > LIMITE:
-            conexao.close()
-            return responder("Limite de 1.000.000,00 por conta excedido.", 400)
-
-        # Grava o novo saldo.
+        # Grava o novo saldo (a conta pode ultrapassar 1.000.000).
         cursor.execute("UPDATE contas SET saldo = ? WHERE id = ?", (novo_saldo, conta))
         # Registra a movimentacao (aparece no extrato).
         cursor.execute(
