@@ -1,4 +1,6 @@
 # Rota /saldo: informa o saldo de uma conta.
+import contextlib
+
 from flask import Blueprint, request
 
 import banco
@@ -19,13 +21,12 @@ def saldo():
         return responder("Informe a conta (?conta=...).", 400)
 
     try:
-        conexao = banco.conectar()
-        cursor = conexao.cursor()
+        with contextlib.closing(banco.conectar()) as conexao:
+            cursor = conexao.cursor()
 
-        # Busca o saldo da conta pedida.
-        cursor.execute("SELECT saldo FROM contas WHERE id = ?", (conta,))
-        linha = cursor.fetchone()
-        conexao.close()
+            # Busca o saldo da conta pedida.
+            cursor.execute("SELECT saldo FROM contas WHERE id = ?", (conta,))
+            linha = cursor.fetchone()
 
         if linha:
             return responder("Saldo da conta " + conta + ": " + str(linha[0]))

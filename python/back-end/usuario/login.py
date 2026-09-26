@@ -1,4 +1,6 @@
 # Rota /login: verifica usuario e senha e informa se o acesso foi liberado.
+import contextlib
+
 from flask import Blueprint, request, session
 
 import banco
@@ -17,16 +19,15 @@ def login():
         return responder("Informe usuario e senha.", 400)
 
     try:
-        conexao = banco.conectar()
-        cursor = conexao.cursor()
+        with contextlib.closing(banco.conectar()) as conexao:
+            cursor = conexao.cursor()
 
-        # Monta a consulta com o usuario e a senha recebidos.
-        sql = ("SELECT id FROM usuarios "
-               "WHERE usuario = '" + usuario + "' AND senha = '" + senha + "'")
-        cursor.execute(sql)
+            # Monta a consulta com o usuario e a senha recebidos.
+            sql = ("SELECT id FROM usuarios "
+                   "WHERE usuario = '" + usuario + "' AND senha = '" + senha + "'")
+            cursor.execute(sql)
 
-        linha = cursor.fetchone()
-        conexao.close()
+            linha = cursor.fetchone()
 
         if linha:
             # Guarda na sessao quem acabou de logar.

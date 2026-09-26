@@ -1,4 +1,6 @@
 # Rota /me: informa o usuario logado (pela sessao) e se ele e admin.
+import contextlib
+
 from flask import Blueprint
 
 import banco
@@ -15,17 +17,16 @@ def me():
         return responder("Faca login primeiro.", 401)
 
     try:
-        conexao = banco.conectar()
-        cursor = conexao.cursor()
+        with contextlib.closing(banco.conectar()) as conexao:
+            cursor = conexao.cursor()
 
-        # Busca o nome de login e se e administrador.
-        cursor.execute("SELECT usuario, admin FROM usuarios WHERE id = ?", (usuario_id,))
-        linha = cursor.fetchone()
+            # Busca o nome de login e se e administrador.
+            cursor.execute("SELECT usuario, admin FROM usuarios WHERE id = ?", (usuario_id,))
+            linha = cursor.fetchone()
 
-        # Busca o numero da conta do usuario (a primeira, se tiver varias).
-        cursor.execute("SELECT id FROM contas WHERE usuario_id = ? ORDER BY id LIMIT 1", (usuario_id,))
-        conta = cursor.fetchone()
-        conexao.close()
+            # Busca o numero da conta do usuario (a primeira, se tiver varias).
+            cursor.execute("SELECT id FROM contas WHERE usuario_id = ? ORDER BY id LIMIT 1", (usuario_id,))
+            conta = cursor.fetchone()
 
         if linha:
             return responder_json({

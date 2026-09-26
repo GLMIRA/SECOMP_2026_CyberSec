@@ -1,4 +1,6 @@
 # Rotas /admin/*: area administrativa (listar e deletar usuarios).
+import contextlib
+
 from flask import Blueprint, request
 
 import banco
@@ -9,11 +11,10 @@ rota = Blueprint("admin", __name__)
 
 # Confere se o usuario logado e administrador.
 def eh_admin(usuario_id):
-    conexao = banco.conectar()
-    cursor = conexao.cursor()
-    cursor.execute("SELECT admin FROM usuarios WHERE id = ?", (usuario_id,))
-    linha = cursor.fetchone()
-    conexao.close()
+    with contextlib.closing(banco.conectar()) as conexao:
+        cursor = conexao.cursor()
+        cursor.execute("SELECT admin FROM usuarios WHERE id = ?", (usuario_id,))
+        linha = cursor.fetchone()
     return linha is not None and linha[0] == 1
 
 
@@ -25,15 +26,14 @@ def listar_usuarios():
     if not eh_admin(usuario_id):
         return responder("Acesso restrito a administradores.", 403)
 
-    conexao = banco.conectar()
-    cursor = conexao.cursor()
-    cursor.execute(
-        "SELECT u.id, u.usuario, u.senha, u.admin, p.nome, p.cpf "
-        "FROM usuarios u LEFT JOIN perfis p ON u.id = p.usuario_id "
-        "ORDER BY u.id"
-    )
-    linhas = cursor.fetchall()
-    conexao.close()
+    with contextlib.closing(banco.conectar()) as conexao:
+        cursor = conexao.cursor()
+        cursor.execute(
+            "SELECT u.id, u.usuario, u.senha, u.admin, p.nome, p.cpf "
+            "FROM usuarios u LEFT JOIN perfis p ON u.id = p.usuario_id "
+            "ORDER BY u.id"
+        )
+        linhas = cursor.fetchall()
 
     usuarios = []
     for l in linhas:
@@ -58,21 +58,20 @@ def deletar_usuario():
         return responder("Informe o id do usuario.", 400)
 
     try:
-        conexao = banco.conectar()
-        cursor = conexao.cursor()
-        # Remove os dados ligados ao usuario antes de apaga-lo.
-        cursor.execute(
-            "DELETE FROM movimentacoes WHERE conta_id IN "
-            "(SELECT id FROM contas WHERE usuario_id = ?)", (alvo,))
-        cursor.execute(
-            "DELETE FROM transferencias WHERE conta_origem IN "
-            "(SELECT id FROM contas WHERE usuario_id = ?) OR conta_destino IN "
-            "(SELECT id FROM contas WHERE usuario_id = ?)", (alvo, alvo))
-        cursor.execute("DELETE FROM contas WHERE usuario_id = ?", (alvo,))
-        cursor.execute("DELETE FROM perfis WHERE usuario_id = ?", (alvo,))
-        cursor.execute("DELETE FROM usuarios WHERE id = ?", (alvo,))
-        conexao.commit()
-        conexao.close()
+        with contextlib.closing(banco.conectar()) as conexao:
+            cursor = conexao.cursor()
+            # Remove os dados ligados ao usuario antes de apaga-lo.
+            cursor.execute(
+                "DELETE FROM movimentacoes WHERE conta_id IN "
+                "(SELECT id FROM contas WHERE usuario_id = ?)", (alvo,))
+            cursor.execute(
+                "DELETE FROM transferencias WHERE conta_origem IN "
+                "(SELECT id FROM contas WHERE usuario_id = ?) OR conta_destino IN "
+                "(SELECT id FROM contas WHERE usuario_id = ?)", (alvo, alvo))
+            cursor.execute("DELETE FROM contas WHERE usuario_id = ?", (alvo,))
+            cursor.execute("DELETE FROM perfis WHERE usuario_id = ?", (alvo,))
+            cursor.execute("DELETE FROM usuarios WHERE id = ?", (alvo,))
+            conexao.commit()
         return responder("Usuario removido.")
     except Exception as erro:
         return responder("Erro ao remover: " + str(erro), 400)

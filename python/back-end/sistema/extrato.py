@@ -1,4 +1,6 @@
 # Rota /extrato: lista as movimentacoes das contas do usuario logado.
+import contextlib
+
 from flask import Blueprint
 
 import banco
@@ -15,18 +17,17 @@ def extrato():
         return responder("Faca login primeiro.", 401)
 
     try:
-        conexao = banco.conectar()
-        cursor = conexao.cursor()
+        with contextlib.closing(banco.conectar()) as conexao:
+            cursor = conexao.cursor()
 
-        # Busca as movimentacoes (deposito, saque, ...) das contas do usuario.
-        cursor.execute(
-            "SELECT tipo, conta_id, valor, data FROM movimentacoes "
-            "WHERE conta_id IN (SELECT id FROM contas WHERE usuario_id = ?) "
-            "ORDER BY data DESC",
-            (usuario_id,),
-        )
-        linhas = cursor.fetchall()
-        conexao.close()
+            # Busca as movimentacoes (deposito, saque, ...) das contas do usuario.
+            cursor.execute(
+                "SELECT tipo, conta_id, valor, data FROM movimentacoes "
+                "WHERE conta_id IN (SELECT id FROM contas WHERE usuario_id = ?) "
+                "ORDER BY data DESC",
+                (usuario_id,),
+            )
+            linhas = cursor.fetchall()
 
         if not linhas:
             return responder("Nenhuma movimentacao.")
