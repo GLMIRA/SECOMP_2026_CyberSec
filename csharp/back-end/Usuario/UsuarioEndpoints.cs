@@ -457,6 +457,12 @@ public static class UsuarioEndpoints
                 mov.Parameters.AddWithValue("@v", valorDevolvido);
                 mov.ExecuteNonQuery();
 
+                // Uma transferencia so pode ser estornada uma vez.
+                var remover = conexao.CreateCommand();
+                remover.CommandText = "DELETE FROM transferencias WHERE id = @id";
+                remover.Parameters.AddWithValue("@id", alvo);
+                remover.ExecuteNonQuery();
+
                 await Web.Responder(ctx, "Transferencia estornada. Valor devolvido a conta " + origem + ".");
             }
             catch (Exception erro)

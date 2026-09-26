@@ -143,6 +143,11 @@ public class AdminHandler implements HttpHandler {
             mov.setDouble(2, valorDevolvido);
             mov.executeUpdate();
 
+            // Uma transferencia so pode ser estornada uma vez.
+            PreparedStatement remover = conexao.prepareStatement("DELETE FROM transferencias WHERE id = ?");
+            remover.setString(1, alvo);
+            remover.executeUpdate();
+
             Util.responder(troca, 200, "Transferencia estornada. Valor devolvido a conta " + origem + ".");
         }
     }

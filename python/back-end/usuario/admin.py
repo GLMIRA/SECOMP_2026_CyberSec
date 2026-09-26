@@ -105,6 +105,8 @@ def estornar_transferencia():
             cursor.execute(
                 "INSERT INTO movimentacoes (conta_id, tipo, valor) VALUES (?, 'estorno', ?)",
                 (origem, valor_devolvido))
+            # Uma transferencia so pode ser estornada uma vez.
+            cursor.execute("DELETE FROM transferencias WHERE id = ?", (alvo,))
             conexao.commit()
         return responder("Transferencia estornada. Valor devolvido a conta " + str(origem) + ".")
     except Exception as erro:
