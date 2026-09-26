@@ -17,6 +17,17 @@ falhas propositais**.
 | [`python/`](python/) | Python (Flask + SQLite) | 8091 | [`python/docs/COMO_RODAR.md`](python/docs/COMO_RODAR.md) |
 | [`csharp/`](csharp/) | C# (ASP.NET Core + SQLite) | 8092 | [`csharp/docs/COMO_RODAR.md`](csharp/docs/COMO_RODAR.md) |
 
+## Organização do back-end
+
+Nas três versões, as rotas são separadas por área:
+
+- **Sistema** (operações da conta): `saldo`, `deposito`, `saque`, `transferencia`, `extrato`, `comprovante`
+- **Usuário** (conta / identidade / admin): `cadastro`, `login`, `logout`, `me`, `recuperar-senha`, `perfil`, `admin`
+
+Cada stack segue o padrão da linguagem: **Java** em pacotes `core / sistema / usuario`;
+**C#** em `Sistema/` + `Usuario/` (métodos de extensão) com `Program.cs` de bootstrap;
+**Python** em `back-end/sistema/` + `back-end/usuario/`.
+
 ## Para quem?
 
 - **CTF:** encontre e explore as vulnerabilidades escondidas na aplicação.

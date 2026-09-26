@@ -1,3 +1,9 @@
+package usuario;
+
+import core.Banco;
+import core.Util;
+import core.Sessao;
+
 // Rota /cadastro: cria um novo cliente (usuario, perfil e uma conta).
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;

@@ -1,3 +1,9 @@
+package usuario;
+
+import core.Banco;
+import core.Util;
+import core.Sessao;
+
 // Rota /me: informa o usuario logado (pela sessao), se e admin e o numero da conta.
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;

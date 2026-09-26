@@ -1,3 +1,5 @@
+package core;
+
 // Sessao simples em memoria, identificada por um cookie "session".
 import com.sun.net.httpserver.HttpExchange;
 import java.util.Map;

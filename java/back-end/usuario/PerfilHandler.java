@@ -1,3 +1,9 @@
+package usuario;
+
+import core.Banco;
+import core.Util;
+import core.Sessao;
+
 // Rota /perfil: mostra (GET) e atualiza (POST) os dados do usuario logado.
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;

@@ -1,3 +1,9 @@
+package sistema;
+
+import core.Banco;
+import core.Util;
+import core.Sessao;
+
 // Rota /comprovante: baixa o comprovante (arquivo) de uma operacao.
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;

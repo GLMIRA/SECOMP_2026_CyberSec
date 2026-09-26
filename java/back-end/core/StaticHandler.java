@@ -1,3 +1,5 @@
+package core;
+
 // Serve os arquivos do front-end (pasta "front-end") como conteudo estatico.
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;

@@ -1,3 +1,9 @@
+package usuario;
+
+import core.Banco;
+import core.Util;
+import core.Sessao;
+
 // Rota /login: verifica usuario e senha e abre a sessao.
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;

@@ -1,3 +1,9 @@
+package sistema;
+
+import core.Banco;
+import core.Util;
+import core.Sessao;
+
 // Rota /saldo: informa o saldo de uma conta.
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;

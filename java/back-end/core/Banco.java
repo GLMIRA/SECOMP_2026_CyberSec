@@ -1,3 +1,5 @@
+package core;
+
 // Conexao com o banco de dados SQLite.
 import java.io.IOException;
 import java.nio.file.Files;

@@ -1,3 +1,5 @@
+package core;
+
 // Funcoes auxiliares para ler requisicoes e enviar respostas HTTP.
 import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;

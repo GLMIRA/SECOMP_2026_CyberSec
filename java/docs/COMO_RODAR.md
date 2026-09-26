@@ -19,12 +19,12 @@
 
 2. **Compilar:**
    ```bash
-   javac -d back-end/out back-end/*.java
+   javac -d back-end/out $(find back-end -name "*.java")
    ```
 
 3. **Rodar o servidor:**
    ```bash
-   java -cp "back-end/out:lib/sqlite-jdbc.jar:lib/slf4j-api.jar" Main
+   java -cp "back-end/out:lib/sqlite-jdbc.jar:lib/slf4j-api.jar" core.Main
    ```
 
 4. **Acessar:** http://localhost:8090

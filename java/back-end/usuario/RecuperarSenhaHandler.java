@@ -1,3 +1,9 @@
+package usuario;
+
+import core.Banco;
+import core.Util;
+import core.Sessao;
+
 // Rota /recuperar-senha: troca a senha depois de confirmar a identidade (usuario + cpf).
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;

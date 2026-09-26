@@ -1,3 +1,9 @@
+package sistema;
+
+import core.Banco;
+import core.Util;
+import core.Sessao;
+
 // Rota /transferencia: transfere um valor de uma conta para outra.
 // ESQUELETO - a implementacao deve ser feita aqui.
 import com.sun.net.httpserver.HttpExchange;
