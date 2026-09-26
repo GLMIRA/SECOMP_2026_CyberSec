@@ -20,6 +20,7 @@
         <a href="saldo.html" class="ativo">Saldo</a>
         <a href="deposito.html">Depositar</a>
         <a href="saque.html">Sacar</a>
+        <a href="transferencia.html">Transferir</a>
         <a href="extrato.html">Extrato</a>
         <a href="perfil.html">Meu usuario</a>
         <a href="admin.html" id="link-admin" class="oculto">Admin</a>
@@ -36,16 +37,6 @@
                 <input id="saldo_conta" placeholder="numero da conta">
                 <button onclick="verSaldo()">Consultar</button>
                 <div id="msg_saldo" class="msg"></div>
-            </div>
-
-            <!-- Transferencia -->
-            <div class="card">
-                <h2>Transferir</h2>
-                <input id="tra_origem" placeholder="conta de origem">
-                <input id="tra_destino" placeholder="conta de destino">
-                <input id="tra_valor" placeholder="valor">
-                <button onclick="transferir()">Transferir</button>
-                <div id="msg_transferencia" class="msg"></div>
             </div>
         </div>
     </main>

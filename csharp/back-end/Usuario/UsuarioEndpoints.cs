@@ -350,6 +350,121 @@ public static class UsuarioEndpoints
             await Web.ResponderJson(ctx, usuarios);
         });
 
+        // ---------- Admin: listar transferencias ----------
+        app.MapGet("/admin/transferencias", async (HttpContext ctx) =>
+        {
+            var usuarioId = Web.UsuarioLogado(ctx);
+            if (usuarioId == null)
+            {
+                await Web.Responder(ctx, "Faca login primeiro.", 401);
+                return;
+            }
+            if (!Web.EhAdmin(usuarioId.Value))
+            {
+                await Web.Responder(ctx, "Acesso restrito a administradores.", 403);
+                return;
+            }
+
+            using var conexao = Banco.Conectar();
+            using var cmd = conexao.CreateCommand();
+            cmd.CommandText = "SELECT id, conta_origem, conta_destino, valor, data "
+                + "FROM transferencias ORDER BY id DESC";
+            using var reader = cmd.ExecuteReader();
+
+            var transferencias = new List<object>();
+            while (reader.Read())
+            {
+                transferencias.Add(new
+                {
+                    id = reader.GetInt64(0),
+                    origem = reader.GetInt64(1),
+                    destino = reader.GetInt64(2),
+                    valor = reader.GetDouble(3),
+                    data = reader.IsDBNull(4) ? null : reader.GetString(4),
+                });
+            }
+
+            await Web.ResponderJson(ctx, transferencias);
+        });
+
+        // ---------- Admin: estornar transferencia ----------
+        app.MapPost("/admin/estornar", async (HttpContext ctx) =>
+        {
+            var usuarioId = Web.UsuarioLogado(ctx);
+            if (usuarioId == null)
+            {
+                await Web.Responder(ctx, "Faca login primeiro.", 401);
+                return;
+            }
+            if (!Web.EhAdmin(usuarioId.Value))
+            {
+                await Web.Responder(ctx, "Acesso restrito a administradores.", 403);
+                return;
+            }
+
+            string alvo;
+            try
+            {
+                using var doc = await JsonDocument.ParseAsync(ctx.Request.Body);
+                alvo = doc.RootElement.GetProperty("id").ToString();
+            }
+            catch
+            {
+                await Web.Responder(ctx, "Informe o id da transferencia.", 400);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(alvo))
+            {
+                await Web.Responder(ctx, "Informe o id da transferencia.", 400);
+                return;
+            }
+
+            try
+            {
+                using var conexao = Banco.Conectar();
+
+                var buscar = conexao.CreateCommand();
+                buscar.CommandText = "SELECT conta_origem, valor FROM transferencias WHERE id = @id";
+                buscar.Parameters.AddWithValue("@id", alvo);
+                using var reader = buscar.ExecuteReader();
+                if (!reader.Read())
+                {
+                    await Web.Responder(ctx, "Transferencia nao encontrada.", 404);
+                    return;
+                }
+                var origem = reader.GetInt64(0);
+                var valor = reader.GetDouble(1);
+                reader.Close();
+
+                // Devolve o valor da transferencia para a conta de origem.
+                var valorDevolvido = Math.Abs(valor);
+
+                var lerSaldo = conexao.CreateCommand();
+                lerSaldo.CommandText = "SELECT saldo FROM contas WHERE id = @c";
+                lerSaldo.Parameters.AddWithValue("@c", origem);
+                var saldo = Convert.ToDouble(lerSaldo.ExecuteScalar());
+
+                var atualizar = conexao.CreateCommand();
+                atualizar.CommandText = "UPDATE contas SET saldo = @s WHERE id = @c";
+                atualizar.Parameters.AddWithValue("@s", saldo + valorDevolvido);
+                atualizar.Parameters.AddWithValue("@c", origem);
+                atualizar.ExecuteNonQuery();
+
+                var mov = conexao.CreateCommand();
+                mov.CommandText = "INSERT INTO movimentacoes (conta_id, tipo, valor) VALUES (@c, 'estorno', @v)";
+                mov.Parameters.AddWithValue("@c", origem);
+                mov.Parameters.AddWithValue("@v", valorDevolvido);
+                mov.ExecuteNonQuery();
+
+                await Web.Responder(ctx, "Transferencia estornada. Valor devolvido a conta " + origem + ".");
+            }
+            catch (Exception erro)
+            {
+                await Web.Responder(ctx, "Erro ao estornar: " + erro.Message, 400);
+            }
+        });
+
         // ---------- Admin: deletar usuario ----------
         app.MapPost("/admin/deletar", async (HttpContext ctx) =>
         {

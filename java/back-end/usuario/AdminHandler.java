@@ -35,6 +35,10 @@ public class AdminHandler implements HttpHandler {
                 listarUsuarios(troca);
             } else if (caminho.endsWith("/deletar")) {
                 deletarUsuario(troca);
+            } else if (caminho.endsWith("/transferencias")) {
+                listarTransferencias(troca);
+            } else if (caminho.endsWith("/estornar")) {
+                estornarTransferencia(troca);
             } else {
                 Util.responder(troca, 404, "Rota admin nao encontrada.");
             }
@@ -68,6 +72,78 @@ public class AdminHandler implements HttpHandler {
             }
             sb.append("]");
             Util.responderJson(troca, 200, sb.toString());
+        }
+    }
+
+    private void listarTransferencias(HttpExchange troca) throws Exception {
+        try (Connection conexao = Banco.conectar()) {
+            PreparedStatement ps = conexao.prepareStatement(
+                    "SELECT id, conta_origem, conta_destino, valor, data "
+                    + "FROM transferencias ORDER BY id DESC");
+            ResultSet rs = ps.executeQuery();
+
+            StringBuilder sb = new StringBuilder("[");
+            boolean primeiro = true;
+            while (rs.next()) {
+                if (!primeiro) {
+                    sb.append(",");
+                }
+                primeiro = false;
+                sb.append("{\"id\":").append(rs.getInt("id"))
+                  .append(",\"origem\":").append(rs.getInt("conta_origem"))
+                  .append(",\"destino\":").append(rs.getInt("conta_destino"))
+                  .append(",\"valor\":").append(rs.getDouble("valor"))
+                  .append(",\"data\":\"").append(Util.escaparJson(rs.getString("data"))).append("\"}");
+            }
+            sb.append("]");
+            Util.responderJson(troca, 200, sb.toString());
+        }
+    }
+
+    private void estornarTransferencia(HttpExchange troca) throws Exception {
+        if (!troca.getRequestMethod().equals("POST")) {
+            Util.responder(troca, 405, "Use POST.");
+            return;
+        }
+        Map<String, String> dados = Util.parseJsonPlano(Util.lerCorpo(troca));
+        String alvo = dados.get("id");
+        if (alvo == null || alvo.isEmpty()) {
+            Util.responder(troca, 400, "Informe o id da transferencia.");
+            return;
+        }
+
+        try (Connection conexao = Banco.conectar()) {
+            PreparedStatement buscar = conexao.prepareStatement(
+                    "SELECT conta_origem, valor FROM transferencias WHERE id = ?");
+            buscar.setString(1, alvo);
+            ResultSet rs = buscar.executeQuery();
+            if (!rs.next()) {
+                Util.responder(troca, 404, "Transferencia nao encontrada.");
+                return;
+            }
+            int origem = rs.getInt("conta_origem");
+            double valor = rs.getDouble("valor");
+
+            // Devolve o valor da transferencia para a conta de origem.
+            double valorDevolvido = Math.abs(valor);
+            PreparedStatement lerSaldo = conexao.prepareStatement("SELECT saldo FROM contas WHERE id = ?");
+            lerSaldo.setInt(1, origem);
+            ResultSet rsSaldo = lerSaldo.executeQuery();
+            rsSaldo.next();
+            double saldo = rsSaldo.getDouble("saldo");
+
+            PreparedStatement atualizar = conexao.prepareStatement("UPDATE contas SET saldo = ? WHERE id = ?");
+            atualizar.setDouble(1, saldo + valorDevolvido);
+            atualizar.setInt(2, origem);
+            atualizar.executeUpdate();
+
+            PreparedStatement mov = conexao.prepareStatement(
+                    "INSERT INTO movimentacoes (conta_id, tipo, valor) VALUES (?, 'estorno', ?)");
+            mov.setInt(1, origem);
+            mov.setDouble(2, valorDevolvido);
+            mov.executeUpdate();
+
+            Util.responder(troca, 200, "Transferencia estornada. Valor devolvido a conta " + origem + ".");
         }
     }
 

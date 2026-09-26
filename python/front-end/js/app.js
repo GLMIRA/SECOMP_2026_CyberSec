@@ -113,6 +113,11 @@ async function transferir() {
         destino: document.getElementById("tra_destino").value,
         valor: document.getElementById("tra_valor").value
     };
+    const valor = parseFloat(dados.valor);
+    if (isNaN(valor) || valor <= 0) {
+        mostrar("msg_transferencia", "O valor da transferencia deve ser positivo.");
+        return;
+    }
     mostrar("msg_transferencia", await enviarPost("/transferencia", dados));
 }
 
@@ -260,6 +265,67 @@ async function deletarUsuario(id) {
     }
     await enviarJson("/admin/deletar", { id: id });
     carregarAdmin();
+}
+
+async function carregarTransferencias() {
+    const alvo = document.getElementById("tabela_transferencias");
+    if (!alvo) return;
+    let transferencias;
+    try {
+        const resposta = await fetch(API + "/admin/transferencias");
+        if (!resposta.ok) {
+            alvo.textContent = await resposta.text();
+            return;
+        }
+        transferencias = await resposta.json();
+    } catch (e) {
+        alvo.textContent = "Nao foi possivel carregar as transferencias.";
+        return;
+    }
+    alvo.innerHTML = "";
+
+    if (transferencias.length === 0) {
+        alvo.textContent = "Nenhuma transferencia.";
+        return;
+    }
+
+    const tabela = document.createElement("table");
+    tabela.className = "tabela";
+
+    const cabecalho = document.createElement("tr");
+    for (const titulo of ["ID", "Origem", "Destino", "Valor", "Data", ""]) {
+        const th = document.createElement("th");
+        th.textContent = titulo;
+        cabecalho.appendChild(th);
+    }
+    tabela.appendChild(cabecalho);
+
+    for (const t of transferencias) {
+        const linha = document.createElement("tr");
+        const valores = [t.id, t.origem, t.destino, t.valor, t.data || ""];
+        for (const v of valores) {
+            const td = document.createElement("td");
+            td.textContent = v;
+            linha.appendChild(td);
+        }
+        const acao = document.createElement("td");
+        const botao = document.createElement("button");
+        botao.className = "btn-del";
+        botao.textContent = "Estornar";
+        botao.onclick = function () { estornarTransferencia(t.id); };
+        acao.appendChild(botao);
+        linha.appendChild(acao);
+        tabela.appendChild(linha);
+    }
+    alvo.appendChild(tabela);
+}
+
+async function estornarTransferencia(id) {
+    if (!confirm("Estornar a transferencia " + id + "?")) {
+        return;
+    }
+    await enviarJson("/admin/estornar", { id: id });
+    carregarTransferencias();
 }
 
 document.addEventListener("DOMContentLoaded", function () {

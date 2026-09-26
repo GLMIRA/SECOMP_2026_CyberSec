@@ -44,6 +44,73 @@ def listar_usuarios():
     return responder_json(usuarios)
 
 
+@rota.route("/admin/transferencias", methods=["GET"])
+def listar_transferencias():
+    usuario_id = usuario_logado()
+    if usuario_id is None:
+        return responder("Faca login primeiro.", 401)
+    if not eh_admin(usuario_id):
+        return responder("Acesso restrito a administradores.", 403)
+
+    with contextlib.closing(banco.conectar()) as conexao:
+        cursor = conexao.cursor()
+        cursor.execute(
+            "SELECT id, conta_origem, conta_destino, valor, data "
+            "FROM transferencias ORDER BY id DESC"
+        )
+        linhas = cursor.fetchall()
+
+    transferencias = []
+    for l in linhas:
+        transferencias.append({
+            "id": l[0], "origem": l[1], "destino": l[2],
+            "valor": l[3], "data": l[4],
+        })
+    return responder_json(transferencias)
+
+
+@rota.route("/admin/estornar", methods=["POST"])
+def estornar_transferencia():
+    usuario_id = usuario_logado()
+    if usuario_id is None:
+        return responder("Faca login primeiro.", 401)
+    if not eh_admin(usuario_id):
+        return responder("Acesso restrito a administradores.", 403)
+
+    dados = request.get_json(silent=True) or {}
+    alvo = dados.get("id")
+    if not alvo:
+        return responder("Informe o id da transferencia.", 400)
+
+    try:
+        with contextlib.closing(banco.conectar()) as conexao:
+            cursor = conexao.cursor()
+
+            cursor.execute(
+                "SELECT conta_origem, valor FROM transferencias WHERE id = ?", (alvo,))
+            linha = cursor.fetchone()
+            if not linha:
+                return responder("Transferencia nao encontrada.", 404)
+
+            origem = linha[0]
+            valor = linha[1]
+
+            # Devolve o valor da transferencia para a conta de origem.
+            valor_devolvido = abs(valor)
+            cursor.execute("SELECT saldo FROM contas WHERE id = ?", (origem,))
+            saldo = cursor.fetchone()[0]
+            cursor.execute(
+                "UPDATE contas SET saldo = ? WHERE id = ?",
+                (saldo + valor_devolvido, origem))
+            cursor.execute(
+                "INSERT INTO movimentacoes (conta_id, tipo, valor) VALUES (?, 'estorno', ?)",
+                (origem, valor_devolvido))
+            conexao.commit()
+        return responder("Transferencia estornada. Valor devolvido a conta " + str(origem) + ".")
+    except Exception as erro:
+        return responder("Erro ao estornar: " + str(erro), 400)
+
+
 @rota.route("/admin/deletar", methods=["POST"])
 def deletar_usuario():
     usuario_id = usuario_logado()

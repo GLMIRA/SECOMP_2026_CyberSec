@@ -214,7 +214,7 @@ public static class SistemaEndpoints
             }
         });
 
-        // ---------- Transferencia (ESQUELETO) ----------
+        // ---------- Transferencia ----------
         app.MapPost("/transferencia", async (HttpContext ctx) =>
         {
             var usuarioId = Web.UsuarioLogado(ctx);
@@ -227,16 +227,110 @@ public static class SistemaEndpoints
             var form = await ctx.Request.ReadFormAsync();
             var origem = form["origem"].ToString();
             var destino = form["destino"].ToString();
-            var valor = form["valor"].ToString();
+            var valorTexto = form["valor"].ToString();
 
-            // TODO: validar os campos recebidos (origem, destino e valor).
-            // TODO: conferir que a conta de origem pertence ao usuario logado (Banco.ContaPertence).
-            // TODO: buscar o saldo da origem e aplicar as regras de negocio
-            //       (valor positivo, saldo suficiente, teto de 1.000.000,00).
-            // TODO: debitar da origem e creditar no destino.
-            // TODO: registrar em "transferencias" e em "movimentacoes" (pra aparecer no extrato).
-            // TODO: responder com o resultado da operacao.
-            await Web.Responder(ctx, "Transferencia ainda nao implementada.", 501);
+            if (string.IsNullOrEmpty(origem) || string.IsNullOrEmpty(destino) || string.IsNullOrEmpty(valorTexto))
+            {
+                await Web.Responder(ctx, "Informe origem, destino e valor.", 400);
+                return;
+            }
+            if (origem == destino)
+            {
+                await Web.Responder(ctx, "Origem e destino nao podem ser a mesma conta.", 400);
+                return;
+            }
+
+            if (!double.TryParse(valorTexto, NumberStyles.Any, CultureInfo.InvariantCulture, out var valor))
+            {
+                await Web.Responder(ctx, "Valor invalido.", 400);
+                return;
+            }
+            if (valor > 1_000_000.00)
+            {
+                await Web.Responder(ctx, "Transferencia maxima por operacao e 1.000.000,00.", 400);
+                return;
+            }
+
+            // So pode transferir de uma conta sua.
+            if (!Banco.ContaPertence(origem, usuarioId.Value))
+            {
+                await Web.Responder(ctx, "Essa conta nao e sua.", 403);
+                return;
+            }
+
+            try
+            {
+                using var conexao = Banco.Conectar();
+
+                var lerOrigem = conexao.CreateCommand();
+                lerOrigem.CommandText = "SELECT saldo FROM contas WHERE id = @c";
+                lerOrigem.Parameters.AddWithValue("@c", origem);
+                var saldoOrigemObj = lerOrigem.ExecuteScalar();
+                if (saldoOrigemObj == null)
+                {
+                    await Web.Responder(ctx, "Conta de origem nao encontrada.", 404);
+                    return;
+                }
+
+                var lerDestino = conexao.CreateCommand();
+                lerDestino.CommandText = "SELECT saldo FROM contas WHERE id = @c";
+                lerDestino.Parameters.AddWithValue("@c", destino);
+                var saldoDestinoObj = lerDestino.ExecuteScalar();
+                if (saldoDestinoObj == null)
+                {
+                    await Web.Responder(ctx, "Conta de destino nao encontrada.", 404);
+                    return;
+                }
+
+                var saldoOrigem = Convert.ToDouble(saldoOrigemObj);
+                var saldoDestino = Convert.ToDouble(saldoDestinoObj);
+
+                if (valor > saldoOrigem)
+                {
+                    await Web.Responder(ctx, "Saldo insuficiente.", 400);
+                    return;
+                }
+
+                var novoOrigem = saldoOrigem - valor;
+                var novoDestino = saldoDestino + valor;
+
+                var atualizarOrigem = conexao.CreateCommand();
+                atualizarOrigem.CommandText = "UPDATE contas SET saldo = @s WHERE id = @c";
+                atualizarOrigem.Parameters.AddWithValue("@s", novoOrigem);
+                atualizarOrigem.Parameters.AddWithValue("@c", origem);
+                atualizarOrigem.ExecuteNonQuery();
+
+                var atualizarDestino = conexao.CreateCommand();
+                atualizarDestino.CommandText = "UPDATE contas SET saldo = @s WHERE id = @c";
+                atualizarDestino.Parameters.AddWithValue("@s", novoDestino);
+                atualizarDestino.Parameters.AddWithValue("@c", destino);
+                atualizarDestino.ExecuteNonQuery();
+
+                var registrar = conexao.CreateCommand();
+                registrar.CommandText = "INSERT INTO transferencias (conta_origem, conta_destino, valor) VALUES (@o, @d, @v)";
+                registrar.Parameters.AddWithValue("@o", origem);
+                registrar.Parameters.AddWithValue("@d", destino);
+                registrar.Parameters.AddWithValue("@v", valor);
+                registrar.ExecuteNonQuery();
+
+                var movSaida = conexao.CreateCommand();
+                movSaida.CommandText = "INSERT INTO movimentacoes (conta_id, tipo, valor) VALUES (@c, 'transferencia_saida', @v)";
+                movSaida.Parameters.AddWithValue("@c", origem);
+                movSaida.Parameters.AddWithValue("@v", valor);
+                movSaida.ExecuteNonQuery();
+
+                var movEntrada = conexao.CreateCommand();
+                movEntrada.CommandText = "INSERT INTO movimentacoes (conta_id, tipo, valor) VALUES (@c, 'transferencia_entrada', @v)";
+                movEntrada.Parameters.AddWithValue("@c", destino);
+                movEntrada.Parameters.AddWithValue("@v", valor);
+                movEntrada.ExecuteNonQuery();
+
+                await Web.Responder(ctx, "Transferencia realizada. Novo saldo da origem: " + novoOrigem.ToString(CultureInfo.InvariantCulture));
+            }
+            catch (Exception erro)
+            {
+                await Web.Responder(ctx, "Erro na transferencia: " + erro.Message, 400);
+            }
         });
 
         // ---------- Extrato ----------

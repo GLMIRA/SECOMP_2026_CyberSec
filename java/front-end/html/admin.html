@@ -20,6 +20,7 @@
         <a href="saldo.html">Saldo</a>
         <a href="deposito.html">Depositar</a>
         <a href="saque.html">Sacar</a>
+        <a href="transferencia.html">Transferir</a>
         <a href="extrato.html">Extrato</a>
         <a href="perfil.html">Meu usuario</a>
         <a href="admin.html" id="link-admin" class="oculto ativo">Admin</a>
@@ -34,13 +35,19 @@
                 <h2>Usuarios</h2>
                 <div id="tabela_admin" class="tabela-wrap"></div>
             </div>
+
+            <div class="card">
+                <h2>Transferencias</h2>
+                <div id="tabela_transferencias" class="tabela-wrap"></div>
+            </div>
         </div>
     </main>
 
     <script src="../js/app.js"></script>
     <script>
-        // Ao abrir, carrega a lista de usuarios.
+        // Ao abrir, carrega as listas do painel.
         carregarAdmin();
+        carregarTransferencias();
     </script>
 </body>
 </html>
