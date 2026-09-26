@@ -9,11 +9,19 @@
 
 ---
 
-## ⭐ Jeito mais fácil (Windows ou Linux): IntelliJ
+## ⭐ Jeito mais garantido: terminal
+Os comandos por OS estão abaixo (🐧 Linux / 🪟 Windows). Eles colocam os jars **explicitamente no
+classpath**, então **sempre funcionam** — sem depender de configuração de IDE.
+
+## IntelliJ (atenção a 1 passo obrigatório)
+Se rodar pela IDE, você **precisa** adicionar os jars de `lib/` como biblioteca — senão dá
+`ClassNotFoundException: org.sqlite.JDBC` / "Driver do SQLite nao encontrado no classpath" (o IntelliJ
+não inclui os jars sozinho).
+
 1. Abra a pasta **`java/`** no IntelliJ.
-2. Se pedir, adicione os jars de `lib/` como biblioteca (File → Project Structure → Libraries → + → os 2 `.jar` de `lib/`).
-3. Rode a classe **`core.Main`** (setinha verde ▶). Ele compila e roda sozinho.
-4. Abra **http://localhost:8090**.
+2. No painel **Project**, abra `lib`, selecione os **dois** `.jar` (`sqlite-jdbc.jar` e `slf4j-api.jar`).
+3. **Clique direito → "Add as Library…" → OK.**
+4. Rode a classe **`core.Main`** (▶) → abra **http://localhost:8090**.
 
 ---
 
