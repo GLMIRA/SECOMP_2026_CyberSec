@@ -1,15 +1,11 @@
-// Lógica de front-end (chamadas ao back-end)
+// Front-end: chamadas ao back-end.
 
-// Endereco do back-end. Vazio = mesmo host/porta que serviu a pagina
-// (assim funciona por localhost, IP ou nip.io, e o proxy ve todas as requisicoes).
 const API = "";
 
-// Mostra um texto dentro de um elemento da pagina.
 function mostrar(id, texto) {
     document.getElementById(id).innerHTML = texto;
 }
 
-// Envia um formulario (POST) e devolve a resposta em texto.
 async function enviarPost(rota, dados) {
     const resposta = await fetch(API + rota, {
         method: "POST",
@@ -19,7 +15,6 @@ async function enviarPost(rota, dados) {
     return await resposta.text();
 }
 
-// Envia dados em JSON e devolve a resposta em texto.
 async function enviarJson(rota, dados) {
     const resposta = await fetch(API + rota, {
         method: "POST",
@@ -36,7 +31,6 @@ async function cadastrar() {
     const nome = document.getElementById("cad_nome").value;
     const cpf = document.getElementById("cad_cpf").value;
 
-    // Validacoes feitas AQUI no navegador (front-end).
     if (usuario.length > 15) {
         mostrar("msg_cadastro", "Usuario muito longo (maximo 15 caracteres).");
         return;
@@ -50,7 +44,6 @@ async function cadastrar() {
     mostrar("msg_cadastro", resposta);
 }
 
-// Valida o CPF (digitos verificadores) — usado no cadastro.
 function cpfValido(cpf) {
     cpf = (cpf || "").replace(/[^\d]/g, "");
     if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
@@ -80,7 +73,6 @@ async function logar() {
     const senha = document.getElementById("log_senha").value;
     const resposta = await enviarPost("/login", { usuario: usuario, senha: senha });
 
-    // Se logou, redireciona. O destino pode vir por ?next= na URL.
     if (resposta.startsWith("Login OK")) {
         const destino = new URLSearchParams(window.location.search).get("next");
         window.location = destino || "saldo.html";
@@ -140,29 +132,26 @@ async function recuperarSenha() {
     mostrar("msg_recuperar", await enviarPost("/recuperar-senha", dados));
 }
 
-// ----- Menu lateral retratil -----
+// ----- Menu -----
 function alternarMenu() {
     document.getElementById("sidebar").classList.toggle("aberto");
     document.getElementById("overlayMenu").classList.toggle("aberto");
 }
 
-// ----- Saudacao do usuario logado (nome vem da sessao) -----
+// ----- Saudacao -----
 async function carregarUsuario() {
     try {
         const resposta = await fetch(API + "/me");
         if (!resposta.ok) {
-            // Nao esta logado: manda pro login guardando a pagina que ele queria (?next=).
             window.location = "login.html?next=" + encodeURIComponent(window.location.href);
             return;
         }
         const dados = await resposta.json();
-        // Saudacao com o nome (innerHTML) e o numero da conta ao lado.
         let saudacao = "Ola, " + dados.usuario;
         if (dados.conta) {
             saudacao += " &middot; Conta " + dados.conta;
         }
         document.getElementById("ola").innerHTML = saudacao;
-        // Mostra o item "Admin" no menu apenas para administradores.
         if (dados.admin == 1) {
             const link = document.getElementById("link-admin");
             if (link) {
@@ -170,18 +159,16 @@ async function carregarUsuario() {
             }
         }
     } catch (e) {
-        // sem sessao: deixa a saudacao vazia
     }
 }
 
 // ----- Extrato -----
 async function verExtrato() {
     const resposta = await fetch(API + "/extrato");
-    // Extrato e a tela sem falhas: exibe como texto puro (textContent).
     document.getElementById("msg_extrato").textContent = await resposta.text();
 }
 
-// ----- Meu usuario: carrega os dados atuais na tela -----
+// ----- Meu usuario -----
 async function carregarPerfil() {
     const resposta = await fetch(API + "/perfil");
     if (!resposta.ok) return;
@@ -191,20 +178,17 @@ async function carregarPerfil() {
     document.getElementById("perf_cpf").value = dados.cpf || "";
 }
 
-// ----- Meu usuario: salva as alteracoes -----
 async function atualizarPerfil() {
     const dados = {
         usuario: document.getElementById("perf_usuario").value,
         nome: document.getElementById("perf_nome").value,
         cpf: document.getElementById("perf_cpf").value
     };
-    // So envia a senha se o campo foi preenchido.
     const senha = document.getElementById("perf_senha").value;
     if (senha) {
         dados.senha = senha;
     }
 
-    // A resposta traz o JSON completo (visivel no Burp); na tela mostramos so um aviso.
     const resposta = await enviarJson("/perfil", dados);
     try {
         const json = JSON.parse(resposta);
@@ -221,7 +205,7 @@ async function verComprovante() {
     document.getElementById("msg_comprovante").textContent = await resposta.text();
 }
 
-// ----- Admin: lista os usuarios -----
+// ----- Admin -----
 async function carregarAdmin() {
     const alvo = document.getElementById("tabela_admin");
     if (!alvo) return;
@@ -243,7 +227,7 @@ async function carregarAdmin() {
     tabela.className = "tabela";
 
     const cabecalho = document.createElement("tr");
-    for (const titulo of ["ID", "Usuario", "Nome", "CPF", "Senha", "Admin", ""]) {
+    for (const titulo of ["ID", "Usuario", "Nome", "CPF", "Admin", ""]) {
         const th = document.createElement("th");
         th.textContent = titulo;
         cabecalho.appendChild(th);
@@ -252,10 +236,10 @@ async function carregarAdmin() {
 
     for (const u of usuarios) {
         const linha = document.createElement("tr");
-        const valores = [u.id, u.usuario, u.nome || "", u.cpf || "", u.senha, u.admin ? "sim" : "nao"];
+        const valores = [u.id, u.usuario, u.nome || "", u.cpf || "", u.admin ? "sim" : "nao"];
         for (const v of valores) {
             const td = document.createElement("td");
-            td.textContent = v;   // textContent = seguro (sem XSS)
+            td.textContent = v;
             linha.appendChild(td);
         }
         const acao = document.createElement("td");
@@ -270,7 +254,6 @@ async function carregarAdmin() {
     alvo.appendChild(tabela);
 }
 
-// ----- Admin: deleta um usuario -----
 async function deletarUsuario(id) {
     if (!confirm("Deletar o usuario " + id + "?")) {
         return;
@@ -279,7 +262,6 @@ async function deletarUsuario(id) {
     carregarAdmin();
 }
 
-// Ao abrir uma pagina logada, carrega a saudacao automaticamente.
 document.addEventListener("DOMContentLoaded", function () {
     if (document.getElementById("ola")) {
         carregarUsuario();
