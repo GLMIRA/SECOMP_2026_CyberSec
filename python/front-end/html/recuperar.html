@@ -5,11 +5,450 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Banco CTF - Recuperar senha</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============================================================
+           RESET + VARIÁVEIS
+           ============================================================ */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+
+        :root {
+            --bg: #08090a;
+            --surface: #0f1011;
+            --border: rgba(255,255,255,0.06);
+            --border-strong: rgba(255,255,255,0.1);
+            --text: #f7f8f8;
+            --text-dim: #8a8f98;
+            --text-dimmer: #62666d;
+            --gold: #f5c518;
+            --gold-soft: #d9a800;
+            --gold-light: #ffd947;
+            --gold-glow: rgba(245,197,24,0.18);
+            --green: #4ade80;
+            --red: #f87171;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --mono: 'JetBrains Mono', 'Courier New', monospace;
+            --radius: 4px;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ============================================================
+           NAVBAR — marca à esquerda, menu à direita
+           ============================================================ */
+        .navbar {
+            height: 64px;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: transparent;
+            position: relative;
+            z-index: 10;
+        }
+
+        .marca {
+            font-weight: 600;
+            font-size: 15px;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .marca span {
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .menu {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+        }
+
+        .menu a {
+            color: var(--text-dimmer);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 450;
+            position: relative;
+            transition: color 0.2s ease;
+        }
+
+        .menu a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -3px;
+            height: 1px;
+            background: currentColor;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .menu a:hover { color: var(--text); }
+        .menu a:hover::after { transform: scaleX(1); }
+
+        .menu a.ativo {
+            color: var(--gold);
+            font-weight: 500;
+        }
+        .menu a.ativo::after { transform: scaleX(1); }
+
+        /* ============================================================
+           ÁREA CENTRAL
+           ============================================================ */
+        .home-centro {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 24px 60px;
+            position: relative;
+        }
+
+        .com-fundo::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(ellipse, rgba(245,197,24,0.06), transparent 65%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ============================================================
+           ACESSO
+           ============================================================ */
+        .acesso {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 32px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .acesso .logo {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            opacity: 0.9;
+        }
+
+        /* ============================================================
+           CARD
+           ============================================================ */
+        .card {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .card h2 {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+            text-align: center;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        /* ============================================================
+           GRUPO DE INPUT COM LABEL
+           ============================================================ */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-family: var(--mono);
+            font-size: 10.5px;
+            color: var(--text-dimmer);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-weight: 500;
+            padding-left: 2px;
+        }
+
+        /* ============================================================
+           INPUTS
+           ============================================================ */
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 14.5px;
+            font-weight: 450;
+            transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+            outline: none;
+        }
+
+        input::placeholder {
+            color: var(--text-dimmer);
+            font-weight: 400;
+        }
+
+        input:focus {
+            border-color: rgba(245,197,24,0.35);
+            background: rgba(255,255,255,0.04);
+            box-shadow: 0 0 0 3px rgba(245,197,24,0.06);
+        }
+
+        /* ============================================================
+           BOTÃO
+           ============================================================ */
+        button {
+            width: 100%;
+            padding: 13px 20px;
+            margin-top: 8px;
+            background: var(--gold);
+            border: none;
+            border-radius: var(--radius);
+            color: #0a0a0a;
+            font-family: var(--font);
+            font-size: 14.5px;
+            font-weight: 600;
+            letter-spacing: -0.005em;
+            cursor: pointer;
+            transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.1s ease;
+        }
+
+        button:hover {
+            background: var(--gold-light);
+            box-shadow: 0 4px 16px rgba(245,197,24,0.25);
+        }
+
+        button:active {
+            background: var(--gold-soft);
+            transform: scale(0.98);
+            box-shadow: none;
+        }
+
+        /* ============================================================
+           MENSAGEM
+           ============================================================ */
+        .msg {
+            font-size: 13.5px;
+            line-height: 1.5;
+            color: var(--text-dim);
+            padding: 10px 14px;
+            border-radius: var(--radius);
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            word-break: break-word;
+            text-align: center;
+        }
+
+        .msg:empty { display: none; }
+
+        .msg.erro {
+            color: var(--red);
+            background: rgba(248,113,113,0.06);
+            border-color: rgba(248,113,113,0.15);
+        }
+
+        .msg.sucesso {
+            color: var(--green);
+            background: rgba(74,222,128,0.06);
+            border-color: rgba(74,222,128,0.15);
+        }
+
+        /* ============================================================
+           LINK "Voltar ao login"
+           ============================================================ */
+        .links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            margin-top: 4px;
+            font-size: 13px;
+        }
+
+        .links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.15s ease;
+        }
+
+        .links a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -2px;
+            height: 1px;
+            background: currentColor;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .links a:hover { color: var(--gold); }
+        .links a:hover::after { transform: scaleX(1); }
+
+        /* ============================================================
+           RODAPÉ
+           ============================================================ */
+        .rodape {
+            padding: 20px 32px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-dimmer);
+            line-height: 1.5;
+            opacity: 0.7;
+        }
+
+        /* ============================================================
+           RESPONSIVO — Tablet
+           ============================================================ */
+        @media (max-width: 1024px) {
+            .navbar { padding: 0 24px; }
+        }
+
+        /* ============================================================
+           RESPONSIVO — Mobile grande
+           ============================================================ */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 20px;
+                height: 60px;
+            }
+
+            .marca { font-size: 14.5px; }
+            .menu { gap: 18px; }
+            .menu a { font-size: 13.5px; }
+
+            .home-centro { padding: 32px 20px 40px; }
+            .acesso { gap: 26px; }
+            .acesso .logo { width: 44px; height: 44px; }
+
+            .card {
+                padding: 26px 22px;
+                gap: 16px;
+            }
+
+            .card h2 { font-size: 19px; }
+
+            input {
+                padding: 11px 13px;
+                font-size: 14px;
+            }
+
+            button {
+                padding: 12px 18px;
+                font-size: 14px;
+            }
+
+            .rodape {
+                padding: 16px 20px;
+                font-size: 10.5px;
+            }
+        }
+
+        /* ============================================================
+           RESPONSIVO — Mobile pequeno
+           ============================================================ */
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 0 16px;
+                height: 56px;
+            }
+
+            .marca { font-size: 14px; }
+            .menu { gap: 14px; }
+            .menu a { font-size: 13px; }
+
+            .home-centro { padding: 24px 16px 32px; }
+            .acesso { gap: 22px; }
+            .acesso .logo { width: 40px; height: 40px; }
+
+            .card {
+                padding: 22px 18px;
+                gap: 14px;
+            }
+
+            .card h2 { font-size: 18px; }
+
+            input {
+                padding: 11px 12px;
+                font-size: 13.5px;
+            }
+
+            button {
+                padding: 11px 16px;
+                font-size: 13.5px;
+            }
+
+            .links { font-size: 12.5px; }
+
+            .rodape {
+                padding: 14px 16px;
+                font-size: 10px;
+            }
+        }
+
+        /* ============================================================
+           RESPONSIVO — Mobile extra pequeno
+           ============================================================ */
+        @media (max-width: 360px) {
+            .navbar { padding: 0 12px; height: 54px; }
+            .marca { font-size: 13.5px; }
+            .menu { gap: 12px; }
+            .menu a { font-size: 12.5px; }
+
+            .home-centro { padding: 20px 12px 28px; }
+            .acesso .logo { width: 36px; height: 36px; }
+
+            .card { padding: 20px 16px; gap: 12px; }
+            .card h2 { font-size: 17px; }
+        }
+    </style>
 </head>
 <body class="home">
     <header class="navbar">
-        <div class="marca">BANCO <span>CTF</span></div>
+      <!--  <div class="marca">BANCO <span>CTF</span></div> -->
         <nav class="menu">
             <a href="../index.html">Home</a>
             <a href="login.html">Login</a>
@@ -22,9 +461,22 @@
             <img class="logo" src="../img/logo.svg" alt="Banco CTF">
             <div class="card">
                 <h2>Esqueci minha senha</h2>
-                <input id="rec_usuario" placeholder="usuario">
-                <input id="rec_cpf" placeholder="cpf">
-                <input id="rec_senha" type="password" placeholder="nova senha">
+
+                <div class="form-group">
+                    <label class="form-label" for="rec_usuario">Usuario</label>
+                    <input id="rec_usuario" placeholder="usuario">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="rec_cpf">CPF</label>
+                    <input id="rec_cpf" placeholder="cpf">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="rec_senha">Nova senha</label>
+                    <input id="rec_senha" type="password" placeholder="nova senha">
+                </div>
+
                 <button onclick="recuperarSenha()">Trocar senha</button>
                 <div id="msg_recuperar" class="msg"></div>
                 <div class="links">

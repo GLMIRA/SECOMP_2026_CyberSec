@@ -5,18 +5,549 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Banco CTF - Conta</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============================================================
+           RESET + VARIÁVEIS
+           ============================================================ */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+
+        :root {
+            --bg: #08090a;
+            --surface: #0f1011;
+            --border: rgba(255,255,255,0.06);
+            --border-strong: rgba(255,255,255,0.1);
+            --text: #f7f8f8;
+            --text-dim: #8a8f98;
+            --text-dimmer: #62666d;
+            --gold: #f5c518;
+            --gold-soft: #d9a800;
+            --gold-light: #ffd947;
+            --gold-glow: rgba(245,197,24,0.18);
+            --green: #4ade80;
+            --red: #f87171;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --mono: 'JetBrains Mono', 'Courier New', monospace;
+            --sidebar-width: 240px;
+            --topbar-height: 64px;
+            --radius: 3px;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ============================================================
+           SIDEBAR
+           ============================================================ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 20px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            z-index: 200;
+            overflow-y: auto;
+            transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 10px;
+            margin-bottom: 4px;
+            font-weight: 600;
+            font-size: 16px;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .sidebar-brand span {
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .sidebar-brand svg {
+            width: 22px;
+            height: 22px;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 12px 10px 16px;
+            flex-shrink: 0;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 14px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: -0.005em;
+            border-radius: var(--radius);
+            text-align: left;
+            transition: all 0.15s ease;
+        }
+
+        .sidebar a:hover {
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+        }
+
+        .sidebar a.ativo {
+            background: rgba(255,255,255,0.05);
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .sidebar a.oculto { display: none; }
+
+        .overlay-menu {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            z-index: 150;
+        }
+
+        .overlay-menu.aberto {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ============================================================
+           ÁREA PRINCIPAL
+           ============================================================ */
+        .main-area {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ============================================================
+           TOPBAR
+           ============================================================ */
+        .topbar {
+            height: var(--topbar-height);
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            background: rgba(8,9,10,0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .hamburguer {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: var(--radius);
+            transition: all 0.15s ease;
+            line-height: 1;
+            font-family: inherit;
+        }
+
+        .hamburguer:hover {
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+        }
+
+        .marca {
+            display: none;
+            font-weight: 600;
+            font-size: 15px;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            align-items: center;
+            gap: 5px;
+        }
+
+        .marca span { color: var(--gold); font-weight: 700; }
+
+        .topbar-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dim);
+            letter-spacing: -0.01em;
+        }
+
+        .ola {
+            font-size: 13px;
+            color: var(--text-dimmer);
+            font-weight: 400;
+        }
+
+        .ola strong, .ola b {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        /* ============================================================
+           CONTEÚDO
+           ============================================================ */
+        .conteudo {
+            padding: 48px 40px 80px;
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .conteudo::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 600px;
+            background: radial-gradient(ellipse, rgba(245,197,24,0.05), transparent 65%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ============================================================
+           PAINEL
+           ============================================================ */
+        .painel {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .painel h1 {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+            color: var(--text);
+        }
+
+        .painel h1 span {
+            color: var(--text-dimmer);
+            font-weight: 500;
+        }
+
+        /* ============================================================
+           CARD
+           ============================================================ */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card h2 {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: var(--text);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h2::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 10px var(--gold-glow);
+            flex-shrink: 0;
+        }
+
+        /* ============================================================
+           GRUPO DE INPUT COM LABEL
+           ============================================================ */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-family: var(--mono);
+            font-size: 10.5px;
+            color: var(--text-dimmer);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-weight: 500;
+            padding-left: 2px;
+        }
+
+        /* ============================================================
+           INPUTS
+           ============================================================ */
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 14.5px;
+            font-weight: 450;
+            transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+            outline: none;
+        }
+
+        input::placeholder {
+            color: var(--text-dimmer);
+            font-weight: 400;
+        }
+
+        input:focus {
+            border-color: rgba(245,197,24,0.35);
+            background: rgba(255,255,255,0.04);
+            box-shadow: 0 0 0 3px rgba(245,197,24,0.06);
+        }
+
+        /* Prefixo R$ no campo de valor */
+        .input-currency {
+            position: relative;
+        }
+
+        .input-currency::before {
+            content: 'R$';
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--text-dimmer);
+            font-weight: 500;
+            pointer-events: none;
+        }
+
+        .input-currency input {
+            padding-left: 38px;
+        }
+
+        /* ============================================================
+           BOTÃO
+           ============================================================ */
+        button {
+            width: 100%;
+            padding: 13px 20px;
+            margin-top: 4px;
+            background: var(--gold);
+            border: none;
+            border-radius: var(--radius);
+            color: #0a0a0a;
+            font-family: var(--font);
+            font-size: 14.5px;
+            font-weight: 600;
+            letter-spacing: -0.005em;
+            cursor: pointer;
+            transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.1s ease;
+        }
+
+        button:hover {
+            background: var(--gold-light);
+            box-shadow: 0 4px 16px rgba(245,197,24,0.25);
+        }
+
+        button:active {
+            background: var(--gold-soft);
+            transform: scale(0.98);
+            box-shadow: none;
+        }
+
+        /* Botão secundário (Consultar) */
+        button.btn-secondary {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        button.btn-secondary:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--border-strong);
+            box-shadow: none;
+        }
+
+        /* ============================================================
+           MENSAGEM
+           ============================================================ */
+        .msg {
+            font-size: 13.5px;
+            line-height: 1.5;
+            color: var(--text-dim);
+            padding: 10px 14px;
+            border-radius: var(--radius);
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            word-break: break-word;
+        }
+
+        .msg:empty { display: none; }
+
+        .msg.erro {
+            color: var(--red);
+            background: rgba(248,113,113,0.06);
+            border-color: rgba(248,113,113,0.15);
+        }
+
+        .msg.sucesso {
+            color: var(--green);
+            background: rgba(74,222,128,0.06);
+            border-color: rgba(74,222,128,0.15);
+        }
+
+        .oculto { display: none !important; }
+
+        /* ============================================================
+           SCROLLBAR
+           ============================================================ */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.08);
+            border-radius: 0;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(245,197,24,0.25);
+        }
+
+        /* ============================================================
+           RESPONSIVO — Tablet
+           ============================================================ */
+        @media (max-width: 1024px) {
+            :root { --sidebar-width: 220px; }
+            .conteudo { padding: 40px 32px 72px; }
+        }
+
+        /* ============================================================
+           RESPONSIVO — Mobile: sidebar vira gaveta
+           ============================================================ */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 260px;
+                padding: 20px 14px;
+            }
+
+            .sidebar.aberto {
+                transform: translateX(0);
+            }
+
+            .main-area { margin-left: 0; }
+
+            .hamburguer { display: inline-flex; }
+            .marca { display: flex; }
+            .topbar-title { display: none; }
+
+            .topbar {
+                padding: 0 16px;
+                height: 60px;
+                gap: 12px;
+            }
+
+            .conteudo { padding: 32px 20px 60px; }
+            .painel h1 { font-size: 22px; }
+        }
+
+        /* ============================================================
+           RESPONSIVO — Mobile pequeno
+           ============================================================ */
+        @media (max-width: 480px) {
+            .topbar { padding: 0 14px; height: 56px; }
+            .marca { font-size: 14px; }
+
+            .conteudo { padding: 24px 16px 50px; }
+            .painel h1 { font-size: 20px; }
+
+            .card { padding: 24px 18px; gap: 14px; }
+
+            input { padding: 11px 12px; font-size: 13.5px; }
+            button { padding: 11px 16px; font-size: 13.5px; }
+
+            .input-currency::before {
+                left: 12px;
+                font-size: 12.5px;
+            }
+            .input-currency input {
+                padding-left: 34px;
+            }
+        }
+
+        /* ============================================================
+           RESPONSIVO — Mobile extra pequeno
+           ============================================================ */
+        @media (max-width: 360px) {
+            .conteudo { padding: 20px 12px 40px; }
+            .painel h1 { font-size: 18px; }
+        }
+    </style>
 </head>
 <body class="app">
-    <header class="topbar">
-        <button class="hamburguer" onclick="alternarMenu()">&#9776;</button>
-        <div class="marca">BANCO <span>CTF</span></div>
-        <div class="ola" id="ola"></div>
-    </header>
 
-    <div class="overlay-menu" id="overlayMenu" onclick="alternarMenu()"></div>
+    <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
-        <div class="titulo-menu">MENU</div>
+        <a href="saldo.html" class="sidebar-brand">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 8 L12 3 L20 8 L20 16 L12 21 L4 16 Z"/>
+                <path d="M12 3 L12 21"/>
+            </svg>
+            BANCO <span>CTF</span>
+        </a>
+
+        <div class="sidebar-divider"></div>
+
         <a href="saldo.html" class="ativo">Saldo</a>
         <a href="deposito.html">Depositar</a>
         <a href="saque.html">Sacar</a>
@@ -27,19 +558,40 @@
         <a href="#" onclick="logout(); return false;">Sair</a>
     </aside>
 
-    <main class="conteudo">
-        <div class="painel">
-            <h1>Minha <span>conta</span></h1>
+    <div class="overlay-menu" id="overlayMenu" onclick="alternarMenu()"></div>
 
-            <!-- Consultar saldo -->
-            <div class="card">
-                <h2>Ver saldo</h2>
-                <input id="saldo_conta" placeholder="numero da conta">
-                <button onclick="verSaldo()">Consultar</button>
-                <div id="msg_saldo" class="msg"></div>
+    <!-- ÁREA PRINCIPAL -->
+    <div class="main-area">
+
+        <header class="topbar">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <button class="hamburguer" onclick="alternarMenu()">&#9776;</button>
+                <div class="marca">BANCO <span>CTF</span></div>
+                <span class="topbar-title">Minha conta</span>
             </div>
-        </div>
-    </main>
+            <div class="ola" id="ola"></div>
+        </header>
+
+        <main class="conteudo">
+            <div class="painel">
+                <h1>Minha <span>conta</span></h1>
+
+                <!-- Consultar saldo -->
+                <div class="card">
+                    <h2>Ver saldo</h2>
+
+                    <div class="form-group">
+                        <label class="form-label" for="saldo_conta">Conta</label>
+                        <input id="saldo_conta" placeholder="numero da conta">
+                    </div>
+
+                    <button class="btn-secondary" onclick="verSaldo()">Consultar</button>
+                    <div id="msg_saldo" class="msg"></div>
+                </div>
+            </div>
+        </main>
+
+    </div>
 
     <script src="../js/app.js"></script>
 </body>

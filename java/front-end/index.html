@@ -1,27 +1,368 @@
-<!-- Página inicial do Banco CTF -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Banco CTF</title>
-    <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CTF — Conta digital com cartão sem anuidade</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+
+    <link rel="stylesheet" href="./css/style.css">
 </head>
-<body class="home">
-    <header class="navbar">
-        <div class="marca">BANCO <span>CTF</span></div>
-        <nav class="menu">
-            <a href="index.html" class="ativo">Home</a>
-            <a href="html/login.html">Login</a>
-            <a href="html/cadastro.html">Cadastro</a>
-        </nav>
-    </header>
+<body>
 
-    <main class="home-hero"></main>
+<div class="container">
 
-    <footer class="rodape">
-        AVISO: projeto educacional. Contem codigo inseguro de proposito.
-        NAO use em producao. Uso apenas em localhost.
-    </footer>
+  <!-- HEADER -->
+  <header>
+    <a href="#" class="brand">
+      <svg class="brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 8 L12 3 L20 8 L20 16 L12 21 L4 16 Z"/>
+        <path d="M12 3 L12 21"/>
+      </svg>
+      CTF
+    </a>
+    <nav class="nav-actions">
+      <a class="btn-login"  href="html/login.html" >Entrar</a>
+      <a class="btn-signup"  href="html/login.html">Abrir conta</a>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-card-area">
+      <div class="card-stack">
+        <div class="card">
+          <div class="card-top">
+            <div class="card-brand-row">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                <path d="M4 8 L12 3 L20 8 L20 16 L12 21 L4 16 Z"/>
+                <path d="M12 3 L12 21"/>
+              </svg>
+              CTF
+            </div>
+            <div class="card-chip"></div>
+          </div>
+          <div class="card-number">4729 •••• •••• 8192</div>
+          <div class="card-bottom">
+            <div>
+              <div class="card-holder-label">Titular</div>
+              <div class="card-holder-name">LUCAS MENDES</div>
+            </div>
+            <div class="card-network">
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOCIAL BAR -->
+  <section class="social-bar">
+    <div class="social-icons">
+      <a href="#" aria-label="Instagram" class="social-icon social-instagram">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+        </svg>
+      </a>
+      <a href="#" aria-label="LinkedIn" class="social-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+          <rect x="2" y="9" width="4" height="12"/>
+          <circle cx="4" cy="4" r="2"/>
+        </svg>
+      </a>
+      <a href="#" aria-label="X (Twitter)" class="social-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 2h3l-7.5 8.5L22 22h-7l-5-6.5L4 22H1l8-9L2 2h7l4.5 6L18 2z"/>
+        </svg>
+      </a>
+      <a href="#" aria-label="YouTube" class="social-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/>
+          <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/>
+        </svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- FEATURE -->
+  <section class="feature-main">
+    <div class="feature-text">
+      <div class="eyebrow">01 — Pagamentos</div>
+      <h2>Mova dinheiro <span>sem esperar.</span></h2>
+      <p>Mais de 30 moedas. Liquidação no mesmo dia. Sem taxas escondidas.</p>
+      <ul class="feature-list">
+        <li>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          PIX, TED e SWIFT em uma conta só
+        </li>
+        <li>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Saldo em tempo real
+        </li>
+        <li>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Notificação em cada transação
+        </li>
+      </ul>
+    </div>
+
+    <div class="dashboard-mock">
+      <div class="mock-header">
+        <h4>Atividade recente</h4>
+        <div class="dots"><span></span><span></span><span></span></div>
+      </div>
+      <div class="mock-row">
+        <div class="label"><div class="mock-avatar">SP</div> Supermercado Pão</div>
+        <div class="amount neg">− R$ 218,30</div>
+      </div>
+      <div class="mock-row">
+        <div class="label"><div class="mock-avatar">SA</div> Salário</div>
+        <div class="amount pos">+ R$ 8.420,00</div>
+      </div>
+      <div class="mock-row">
+        <div class="label"><div class="mock-avatar">SP</div> Spotify</div>
+        <div class="amount neg">− R$ 21,90</div>
+      </div>
+      <div class="mock-row">
+        <div class="label"><div class="mock-avatar">PX</div> PIX recebido</div>
+        <div class="amount pos">+ R$ 1.240,00</div>
+      </div>
+      <div class="mock-row">
+        <div class="label"><div class="mock-avatar">UB</div> Uber</div>
+        <div class="amount neg">− R$ 34,80</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats-editorial">
+    <div class="intro">
+      <h3>Banco de verdade, agilidade de fintech.</h3>
+      <p>Regulado pelo Banco Central.</p>
+    </div>
+    <div class="stat-block">
+      <div class="value">R$47,3<sup>bi</sup></div>
+      <div class="desc">movimentados em 2024</div>
+    </div>
+    <div class="stat-block">
+      <div class="value">1,4<sup>s</sup></div>
+      <div class="desc">tempo médio de PIX</div>
+    </div>
+    <div class="stat-block">
+      <div class="value">99,99<sup>%</sup></div>
+      <div class="desc">uptime em 12 meses</div>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <section class="quote-section">
+    <div class="quote-label">Cliente</div>
+    <div class="quote-content">
+      <blockquote>"Migrei minha conta inteira pro CTF em uma tarde. <span>Nunca mais paguei tarifa.</span>"</blockquote>
+      <div class="quote-author">
+        <div class="avatar">RM</div>
+        <div class="info">
+          <strong>Rafael Moraes</strong>
+          <span>São Paulo</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing-minimal" id="precos">
+    <div class="header">
+      <h2>Escolha seu cartão.</h2>
+      <p>Sem anuidade. Cancele quando quiser.</p>
+    </div>
+
+    <div class="plans">
+      <div class="plan">
+        <div class="plan-name">Conta Digital</div>
+        <div class="plan-price">R$0<sub>/mês</sub></div>
+        <p class="plan-desc">Pra fugir das tarifas bancárias.</p>
+        <ul>
+          <li>Cartão virtual ilimitado</li>
+          <li>PIX e TED ilimitados</li>
+          <li>Rende 100% do CDI</li>
+          <li>Saques na rede 24h</li>
+        </ul>
+        <button class="plan-btn">Abrir conta</button>
+      </div>
+
+      <div class="plan featured">
+        <div class="plan-name">CTF Black</div>
+        <div class="plan-price">R$29<sub>/mês</sub></div>
+        <p class="plan-desc">O metálico com os melhores benefícios.</p>
+        <ul>
+          <li>Tudo da Conta Digital</li>
+          <li>Cartão metálico</li>
+          <li>1% de cashback</li>
+          <li>Salas VIP em aeroportos</li>
+          <li>Rende 110% do CDI</li>
+        </ul>
+        <button class="plan-btn">Pedir CTF Black</button>
+      </div>
+
+      <div class="plan">
+        <div class="plan-name">CTF Business</div>
+        <div class="plan-price">R$89<sub>/mês</sub></div>
+        <p class="plan-desc">Pra MEIs, freelancers e empresas.</p>
+        <ul>
+          <li>Tudo do CTF Black</li>
+          <li>Conta PJ completa</li>
+          <li>Boletos e cobranças</li>
+          <li>Cartões para equipe</li>
+          <li>API e integração</li>
+        </ul>
+        <button class="plan-btn">Falar com vendas</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-linear">
+    <div class="faq-header">
+      <h2>FAQ</h2>
+    </div>
+
+    <div class="faq-items">
+      <details class="faq-item" open>
+        <summary>
+          <span class="faq-number">01</span>
+          <span class="faq-question">O CTF é um banco autorizado?</span>
+          <span class="faq-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+        </summary>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            <p>Sim. Somos instituição de pagamento autorizada pelo Banco Central, com recursos em contas segregadas. Seu dinheiro nunca se mistura com o da empresa.</p>
+          </div>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>
+          <span class="faq-number">02</span>
+          <span class="faq-question">O cartão tem anuidade?</span>
+          <span class="faq-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+        </summary>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            <p>Não. Zero anuidade, zero taxa de adesão, zero tarifa de manutenção. O CTF Black tem mensalidade de R$29, mas também sem anuidade.</p>
+          </div>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>
+          <span class="faq-number">03</span>
+          <span class="faq-question">Quanto rende o dinheiro parado?</span>
+          <span class="faq-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+        </summary>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            <p>A Conta Digital rende 100% do CDI todos os dias úteis. O CTF Black rende 110%. Automático, sem precisar aplicar em nada.</p>
+          </div>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>
+          <span class="faq-number">04</span>
+          <span class="faq-question">Em quanto tempo o cartão chega?</span>
+          <span class="faq-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+        </summary>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            <p>Até 4 dias úteis para capitais, 7 dias para outras regiões. O cartão virtual fica disponível na hora.</p>
+          </div>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>
+          <span class="faq-number">05</span>
+          <span class="faq-question">Posso receber meu salário no CTF?</span>
+          <span class="faq-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+        </summary>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            <p>Sim. A portabilidade é 100% digital e leva menos de 5 minutos.</p>
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="brand-col">
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 8 L12 3 L20 8 L20 16 L12 21 L4 16 Z"/>
+          <path d="M12 3 L12 21"/>
+        </svg>
+        CTF
+      </div>
+      <p>Conta digital com cartão sem anuidade.</p>
+    </div>
+    <div>
+      <h5>Produtos</h5>
+      <ul>
+        <li><a href="#">Conta Digital</a></li>
+        <li><a href="#">CTF Black</a></li>
+        <li><a href="#">Business</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Empresa</h5>
+      <ul>
+        <li><a href="#">Sobre</a></li>
+        <li><a href="#">Carreiras</a></li>
+        <li><a href="#">Blog</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Legal</h5>
+      <ul>
+        <li><a href="#">Privacidade</a></li>
+        <li><a href="#">Termos</a></li>
+        <li><a href="#">Ouvidoria</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <div class="footer-bottom">
+    <div>© 2025 CTF Pagamentos S.A. · Instituição autorizada pelo BACEN</div>
+    <div>Feito em São Paulo</div>
+  </div>
+
+</div>
+
+<!-- JavaScript -->
+
+
+    <script src="./js/script.js"></script>
 </body>
 </html>
+
+

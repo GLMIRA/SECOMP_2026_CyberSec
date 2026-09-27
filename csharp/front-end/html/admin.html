@@ -5,18 +5,740 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Banco CTF - Admin</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============================================================
+           RESET + VARIÁVEIS
+           ============================================================ */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+
+        :root {
+            --bg: #08090a;
+            --surface: #0f1011;
+            --surface-2: #141416;
+            --border: rgba(255,255,255,0.06);
+            --border-strong: rgba(255,255,255,0.1);
+            --text: #f7f8f8;
+            --text-dim: #8a8f98;
+            --text-dimmer: #62666d;
+            --gold: #f5c518;
+            --gold-glow: rgba(245,197,24,0.18);
+            --green: #4ade80;
+            --red: #f87171;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --mono: 'JetBrains Mono', 'Courier New', monospace;
+            --sidebar-width: 240px;
+            --topbar-height: 64px;
+            --radius: 3px;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ============================================================
+           SIDEBAR
+           ============================================================ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 20px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            z-index: 200;
+            overflow-y: auto;
+            transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 10px;
+            margin-bottom: 4px;
+            font-weight: 600;
+            font-size: 16px;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .sidebar-brand span {
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .sidebar-brand svg {
+            width: 22px;
+            height: 22px;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 12px 10px 16px;
+            flex-shrink: 0;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 14px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: -0.005em;
+            border-radius: var(--radius);
+            text-align: left;
+            transition: all 0.15s ease;
+            border-left: 2px solid transparent;
+        }
+
+        .sidebar a:hover {
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+        }
+
+        .sidebar a.ativo {
+            background: rgba(255,255,255,0.05);
+            color: var(--text);
+            font-weight: 600;
+            border-left-color: var(--gold);
+        }
+
+        .sidebar a.oculto { display: none; }
+
+        .overlay-menu {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            z-index: 150;
+        }
+
+        .overlay-menu.aberto {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ============================================================
+           ÁREA PRINCIPAL
+           ============================================================ */
+        .main-area {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ============================================================
+           TOPBAR
+           ============================================================ */
+        .topbar {
+            height: var(--topbar-height);
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            background: rgba(8,9,10,0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .hamburguer {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: var(--radius);
+            transition: all 0.15s ease;
+            line-height: 1;
+            font-family: inherit;
+        }
+
+        .hamburguer:hover {
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+        }
+
+        .marca {
+            display: none;
+            font-weight: 600;
+            font-size: 15px;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            align-items: center;
+            gap: 5px;
+        }
+
+        .marca span { color: var(--gold); font-weight: 700; }
+
+        .topbar-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dim);
+            letter-spacing: -0.01em;
+        }
+
+        .ola {
+            font-size: 13px;
+            color: var(--text-dimmer);
+            font-weight: 400;
+        }
+
+        .ola strong, .ola b {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        /* ============================================================
+           CONTEÚDO
+           ============================================================ */
+        .conteudo {
+            padding: 48px 40px 80px;
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .conteudo::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 600px;
+            background: radial-gradient(ellipse, rgba(245,197,24,0.05), transparent 65%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .painel {
+            width: 100%;
+            max-width: 520px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .painel.largo {
+            max-width: 1080px;
+            gap: 28px;
+        }
+
+        /* ============================================================
+           CABEÇALHO DA PÁGINA — só título
+           ============================================================ */
+        .page-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 24px;
+            flex-wrap: wrap;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .page-header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+            line-height: 1.2;
+            color: var(--text);
+        }
+
+        .page-title span {
+            color: var(--text-dimmer);
+            font-weight: 500;
+        }
+
+        /* ============================================================
+           CARD
+           ============================================================ */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-count {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-dimmer);
+            padding: 3px 8px;
+            background: rgba(255,255,255,0.04);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            font-weight: 500;
+        }
+
+        /* ============================================================
+           TABELA
+           ============================================================ */
+        .tabela-wrap {
+            overflow-x: auto;
+        }
+
+        .tabela-wrap table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+            min-width: 720px;
+        }
+
+        .tabela-wrap thead th {
+            padding: 12px 24px;
+            text-align: left;
+            font-family: var(--mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-dimmer);
+            font-weight: 500;
+            background: rgba(255,255,255,0.015);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .tabela-wrap thead th:first-child {
+            width: 70px;
+            text-align: center;
+        }
+
+        .tabela-wrap thead th:last-child {
+            text-align: right;
+            width: 70px;
+        }
+
+        .tabela-wrap tbody tr {
+            transition: background 0.12s ease;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tabela-wrap tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .tabela-wrap tbody tr:hover {
+            background: rgba(255,255,255,0.018);
+        }
+
+        .tabela-wrap tbody tr:hover .user-name {
+            color: var(--text);
+        }
+
+        .tabela-wrap tbody td {
+            padding: 16px 24px;
+            color: var(--text-dim);
+            vertical-align: middle;
+        }
+
+        .tabela-wrap tbody td:first-child {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text-dimmer);
+            text-align: center;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
+
+        .tabela-wrap tbody td:last-child {
+            text-align: right;
+            width: 70px;
+        }
+
+        /* Célula do usuário */
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 0;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius);
+            background: linear-gradient(135deg, rgba(245,197,24,0.18), rgba(217,168,0,0.06));
+            border: 1px solid rgba(245,197,24,0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gold);
+            flex-shrink: 0;
+            letter-spacing: 0.02em;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            min-width: 0;
+        }
+
+        .user-name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            transition: color 0.15s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-badge {
+            font-family: var(--mono);
+            font-size: 9px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 2px;
+            background: rgba(245,197,24,0.1);
+            color: var(--gold);
+            border: 1px solid rgba(245,197,24,0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            flex-shrink: 0;
+        }
+
+        .user-handle {
+            font-family: var(--mono);
+            font-size: 11.5px;
+            color: var(--text-dimmer);
+            font-weight: 400;
+        }
+
+        .cpf-cell {
+            font-family: var(--mono);
+            font-size: 12.5px;
+            color: var(--text-dim);
+            letter-spacing: 0.01em;
+        }
+
+        .saldo-cell {
+            font-family: var(--mono);
+            font-size: 13.5px;
+            color: var(--green);
+            font-weight: 500;
+            text-align: right;
+            white-space: nowrap;
+            letter-spacing: -0.01em;
+        }
+
+        .btn-delete {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: var(--radius);
+            color: var(--text-dimmer);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: inherit;
+            font-size: 15px;
+            opacity: 0;
+        }
+
+        .tabela-wrap tbody tr:hover .btn-delete {
+            opacity: 1;
+        }
+
+        .btn-delete:hover {
+            background: rgba(248,113,113,0.1);
+            border-color: rgba(248,113,113,0.2);
+            color: var(--red);
+        }
+
+        .btn-delete:active {
+            background: rgba(248,113,113,0.15);
+            transform: scale(0.95);
+        }
+
+        /* Botao de estornar transferencia */
+        .btn-estorno {
+            width: auto;
+            margin: 0;
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 12.5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-estorno:hover {
+            background: rgba(245,197,24,0.12);
+            border-color: rgba(245,197,24,0.3);
+            color: var(--gold);
+            box-shadow: none;
+        }
+
+        .btn-estorno:active {
+            transform: scale(0.96);
+        }
+
+        /* ============================================================
+           ESTADO VAZIO
+           ============================================================ */
+        .empty-state {
+            padding: 72px 24px;
+            text-align: center;
+            color: var(--text-dimmer);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .empty-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius);
+            border: 1px dashed var(--border-strong);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dimmer);
+            font-size: 20px;
+            font-weight: 300;
+        }
+
+        .empty-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dim);
+        }
+
+        .empty-text {
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--text-dimmer);
+            max-width: 320px;
+            line-height: 1.5;
+        }
+
+        /* ============================================================
+           MENSAGENS
+           ============================================================ */
+        .msg {
+            font-size: 13px;
+            color: var(--text-dim);
+            line-height: 1.5;
+            padding: 10px 14px;
+            border-radius: var(--radius);
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            word-break: break-word;
+        }
+
+        .msg:empty { display: none; }
+
+        .msg.erro {
+            color: var(--red);
+            background: rgba(248,113,113,0.06);
+            border-color: rgba(248,113,113,0.15);
+        }
+
+        .msg.sucesso {
+            color: var(--green);
+            background: rgba(74,222,128,0.06);
+            border-color: rgba(74,222,128,0.15);
+        }
+
+        .oculto { display: none !important; }
+
+        /* ============================================================
+           SCROLLBAR
+           ============================================================ */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.08);
+            border-radius: 0;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(245,197,24,0.25);
+        }
+
+        /* ============================================================
+           RESPONSIVO — Tablet
+           ============================================================ */
+        @media (max-width: 1024px) {
+            :root { --sidebar-width: 220px; }
+            .conteudo { padding: 40px 32px 72px; }
+            .page-title { font-size: 22px; }
+            .tabela-wrap thead th,
+            .tabela-wrap tbody td { padding: 14px 18px; }
+        }
+
+        /* ============================================================
+           RESPONSIVO — Mobile: sidebar vira gaveta
+           ============================================================ */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 260px;
+                padding: 20px 14px;
+            }
+
+            .sidebar.aberto {
+                transform: translateX(0);
+            }
+
+            .main-area {
+                margin-left: 0;
+            }
+
+            .hamburguer { display: inline-flex; }
+            .marca { display: flex; }
+            .topbar-title { display: none; }
+
+            .topbar {
+                padding: 0 16px;
+                height: 60px;
+                gap: 12px;
+            }
+
+            .conteudo { padding: 32px 20px 60px; }
+            .page-title { font-size: 20px; }
+
+            .tabela-wrap thead th,
+            .tabela-wrap tbody td { padding: 12px 14px; }
+            .tabela-wrap thead th:first-child { width: 50px; }
+            .tabela-wrap thead th:last-child { width: 50px; }
+
+            .user-avatar { width: 32px; height: 32px; font-size: 11px; }
+            .user-name { font-size: 13.5px; }
+            .user-handle { font-size: 11px; }
+            .saldo-cell { font-size: 13px; }
+        }
+
+        /* ============================================================
+           RESPONSIVO — Mobile pequeno
+           ============================================================ */
+        @media (max-width: 480px) {
+            .topbar { padding: 0 14px; height: 56px; }
+            .marca { font-size: 14px; }
+
+            .conteudo { padding: 24px 16px 50px; }
+            .page-title { font-size: 18px; }
+
+            .card-header { padding: 14px 16px; }
+            .card-title { font-size: 12.5px; }
+
+            .tabela-wrap thead th,
+            .tabela-wrap tbody td { padding: 10px 12px; }
+            .tabela-wrap thead th { font-size: 9.5px; }
+            .tabela-wrap tbody td:first-child { font-size: 11px; }
+
+            .user-avatar { width: 30px; height: 30px; font-size: 10.5px; }
+            .user-name { font-size: 13px; }
+            .user-handle { font-size: 10.5px; }
+            .cpf-cell { font-size: 11.5px; }
+            .saldo-cell { font-size: 12.5px; }
+        }
+
+        @media (max-width: 360px) {
+            .conteudo { padding: 20px 12px 40px; }
+            .page-title { font-size: 17px; }
+        }
+    </style>
 </head>
 <body class="app">
-    <header class="topbar">
-        <button class="hamburguer" onclick="alternarMenu()">&#9776;</button>
-        <div class="marca">BANCO <span>CTF</span></div>
-        <div class="ola" id="ola"></div>
-    </header>
 
-    <div class="overlay-menu" id="overlayMenu" onclick="alternarMenu()"></div>
+    <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
-        <div class="titulo-menu">MENU</div>
+        <a href="saldo.html" class="sidebar-brand">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 8 L12 3 L20 8 L20 16 L12 21 L4 16 Z"/>
+                <path d="M12 3 L12 21"/>
+            </svg>
+            BANCO <span>CTF</span>
+        </a>
+
+        <div class="sidebar-divider"></div>
+
         <a href="saldo.html">Saldo</a>
         <a href="deposito.html">Depositar</a>
         <a href="saque.html">Sacar</a>
@@ -27,21 +749,49 @@
         <a href="#" onclick="logout(); return false;">Sair</a>
     </aside>
 
-    <main class="conteudo">
-        <div class="painel largo">
-            <h1>Painel <span>administrativo</span></h1>
+    <div class="overlay-menu" id="overlayMenu" onclick="alternarMenu()"></div>
 
-            <div class="card">
-                <h2>Usuarios</h2>
-                <div id="tabela_admin" class="tabela-wrap"></div>
-            </div>
+    <!-- ÁREA PRINCIPAL -->
+    <div class="main-area">
 
-            <div class="card">
-                <h2>Transferencias</h2>
-                <div id="tabela_transferencias" class="tabela-wrap"></div>
+        <header class="topbar">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <button class="hamburguer" onclick="alternarMenu()">&#9776;</button>
+                <div class="marca">BANCO <span>CTF</span></div>
+                <span class="topbar-title">Painel administrativo</span>
             </div>
-        </div>
-    </main>
+            <div class="ola" id="ola"></div>
+        </header>
+
+        <main class="conteudo">
+            <div class="painel largo">
+
+                <div class="page-header">
+                    <div class="page-header-left">
+                        <h1 class="page-title">Usuarios <span>cadastrados</span></h1>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Todos os usuarios</span>
+                        <span class="card-count" id="user-count">0</span>
+                    </div>
+                    <div id="tabela_admin" class="tabela-wrap"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Transferencias</span>
+                        <span class="card-count" id="transf-count">0</span>
+                    </div>
+                    <div id="tabela_transferencias" class="tabela-wrap"></div>
+                </div>
+
+            </div>
+        </main>
+
+    </div>
 
     <script src="../js/app.js"></script>
     <script>

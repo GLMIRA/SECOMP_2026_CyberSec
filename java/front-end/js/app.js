@@ -210,7 +210,14 @@ async function verComprovante() {
     document.getElementById("msg_comprovante").textContent = await resposta.text();
 }
 
-// ----- Admin -----
+// ----- Admin: usuarios -----
+function iniciais(nome) {
+    if (!nome) return "?";
+    const partes = String(nome).trim().split(" ").filter(Boolean);
+    if (partes.length === 1) return partes[0].substring(0, 2).toUpperCase();
+    return (partes[0][0] + partes[partes.length - 1][0]).toUpperCase();
+}
+
 async function carregarAdmin() {
     const alvo = document.getElementById("tabela_admin");
     if (!alvo) return;
@@ -226,36 +233,82 @@ async function carregarAdmin() {
         alvo.textContent = "Nao foi possivel carregar os usuarios.";
         return;
     }
+    const contador = document.getElementById("user-count");
+    if (contador) contador.textContent = usuarios.length;
+
     alvo.innerHTML = "";
-
     const tabela = document.createElement("table");
-    tabela.className = "tabela";
 
+    const thead = document.createElement("thead");
     const cabecalho = document.createElement("tr");
-    for (const titulo of ["ID", "Usuario", "Nome", "CPF", "Admin", ""]) {
+    for (const titulo of ["ID", "Usuario", "CPF", "Admin", ""]) {
         const th = document.createElement("th");
         th.textContent = titulo;
         cabecalho.appendChild(th);
     }
-    tabela.appendChild(cabecalho);
+    thead.appendChild(cabecalho);
+    tabela.appendChild(thead);
 
+    const tbody = document.createElement("tbody");
     for (const u of usuarios) {
         const linha = document.createElement("tr");
-        const valores = [u.id, u.usuario, u.nome || "", u.cpf || "", u.admin ? "sim" : "nao"];
-        for (const v of valores) {
-            const td = document.createElement("td");
-            td.textContent = v;
-            linha.appendChild(td);
+
+        const tdId = document.createElement("td");
+        tdId.textContent = String(u.id).padStart(2, "0");
+        linha.appendChild(tdId);
+
+        // Celula do usuario (avatar + nome + @usuario). textContent = sem XSS aqui.
+        const tdUser = document.createElement("td");
+        const cell = document.createElement("div");
+        cell.className = "user-cell";
+        const avatar = document.createElement("div");
+        avatar.className = "user-avatar";
+        avatar.textContent = iniciais(u.nome || u.usuario);
+        const info = document.createElement("div");
+        info.className = "user-info";
+        const nomeRow = document.createElement("div");
+        nomeRow.className = "user-name-row";
+        const nome = document.createElement("span");
+        nome.className = "user-name";
+        nome.textContent = u.nome || u.usuario || "Sem nome";
+        nomeRow.appendChild(nome);
+        if (u.admin) {
+            const badge = document.createElement("span");
+            badge.className = "user-badge";
+            badge.textContent = "Admin";
+            nomeRow.appendChild(badge);
         }
-        const acao = document.createElement("td");
+        const handle = document.createElement("span");
+        handle.className = "user-handle";
+        handle.textContent = "@" + (u.usuario || "-");
+        info.appendChild(nomeRow);
+        info.appendChild(handle);
+        cell.appendChild(avatar);
+        cell.appendChild(info);
+        tdUser.appendChild(cell);
+        linha.appendChild(tdUser);
+
+        const tdCpf = document.createElement("td");
+        tdCpf.className = "cpf-cell";
+        tdCpf.textContent = u.cpf || "—";
+        linha.appendChild(tdCpf);
+
+        const tdAdmin = document.createElement("td");
+        tdAdmin.textContent = u.admin ? "sim" : "nao";
+        linha.appendChild(tdAdmin);
+
+        const tdAcao = document.createElement("td");
         const botao = document.createElement("button");
-        botao.className = "btn-del";
-        botao.textContent = "Deletar";
+        botao.className = "btn-delete";
+        botao.title = "Deletar usuario";
+        botao.textContent = "×";
         botao.onclick = function () { deletarUsuario(u.id); };
-        acao.appendChild(botao);
-        linha.appendChild(acao);
-        tabela.appendChild(linha);
+        tdAcao.appendChild(botao);
+        linha.appendChild(tdAcao);
+
+        tbody.appendChild(linha);
     }
+    tabela.appendChild(tbody);
     alvo.appendChild(tabela);
 }
 
@@ -267,6 +320,7 @@ async function deletarUsuario(id) {
     carregarAdmin();
 }
 
+// ----- Admin: transferencias -----
 async function carregarTransferencias() {
     const alvo = document.getElementById("tabela_transferencias");
     if (!alvo) return;
@@ -282,27 +336,39 @@ async function carregarTransferencias() {
         alvo.textContent = "Nao foi possivel carregar as transferencias.";
         return;
     }
-    alvo.innerHTML = "";
+    const contador = document.getElementById("transf-count");
+    if (contador) contador.textContent = transferencias.length;
 
+    alvo.innerHTML = "";
     if (transferencias.length === 0) {
-        alvo.textContent = "Nenhuma transferencia.";
+        const vazio = document.createElement("div");
+        vazio.className = "empty-state";
+        vazio.innerHTML =
+            '<div class="empty-icon">↔</div>' +
+            '<div class="empty-title">Nenhuma transferencia</div>' +
+            '<div class="empty-text">As transferencias feitas pelos clientes aparecem aqui.</div>';
+        alvo.appendChild(vazio);
         return;
     }
 
     const tabela = document.createElement("table");
-    tabela.className = "tabela";
 
+    const thead = document.createElement("thead");
     const cabecalho = document.createElement("tr");
     for (const titulo of ["ID", "Origem", "Destino", "Valor", "Data", ""]) {
         const th = document.createElement("th");
         th.textContent = titulo;
         cabecalho.appendChild(th);
     }
-    tabela.appendChild(cabecalho);
+    thead.appendChild(cabecalho);
+    tabela.appendChild(thead);
 
+    const tbody = document.createElement("tbody");
     for (const t of transferencias) {
         const linha = document.createElement("tr");
-        const valores = [t.id, t.origem, t.destino, t.valor, t.data || ""];
+        const valores = [
+            String(t.id).padStart(2, "0"), t.origem, t.destino, t.valor, t.data || ""
+        ];
         for (const v of valores) {
             const td = document.createElement("td");
             td.textContent = v;
@@ -310,13 +376,14 @@ async function carregarTransferencias() {
         }
         const acao = document.createElement("td");
         const botao = document.createElement("button");
-        botao.className = "btn-del";
+        botao.className = "btn-estorno";
         botao.textContent = "Estornar";
         botao.onclick = function () { estornarTransferencia(t.id); };
         acao.appendChild(botao);
         linha.appendChild(acao);
-        tabela.appendChild(linha);
+        tbody.appendChild(linha);
     }
+    tabela.appendChild(tbody);
     alvo.appendChild(tabela);
 }
 
